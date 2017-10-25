@@ -11,23 +11,23 @@ How this project is different from guides or "hello world" projects at Actions o
 
 _If you have experience in Node.js/JavaScript development, you are more than welcome to contribute in this project. Especially when it comes to good practice in clean code architecture and scaling up this kind of code base. Author of this project is professional mobile developer (statically typed, class based languages) and doesn't have great experience with JavaScript development._
 
-Current tech stack:
+## Current tech stack:
 - [Actions on Google](https://developers.google.com/actions/extending-the-assistant)
 - [Firebase](https://firebase.google.com/): Cloud Functions and Realtime Database - app backend
 - [Dialogflow](https://dialogflow.com/) - conversation definitions and natural language understanding
 - Node.js - Cloud Function implementation
 
-Structure of project:
+## Structure of project:
 - `/assets` contains assets (images, descriptions) required for app submission
 - `/functions` contains code for Firebase Cloud Functions
 - `/Dialogflow` contains code and data for Dialogflow platform (conversation definitions, actions, intents)
 
 # TODO
 
-## Testing, installation, deployment instructions
+### Testing, installation, deployment instructions
 
 To launch unit tests run  `$ npm test` from `functions/` directory.
 
-## App screenshots
+### App screenshots
 
-##
+###
