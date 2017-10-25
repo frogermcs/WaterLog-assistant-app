@@ -9,7 +9,7 @@ App is available live through Google Assistant directory on your device or under
 The main goal for this project is to show full stack solution for voice-interface application. Source code will be developed over time to handle new features and platforms in the future.
 How this project is different from guides or "hello world" projects at Actions on Google or Dialogflow? It's designed to be production-ready app, contains basic unit tests and clean code to be ready for further development or adaptation in similar apps.
 
-_If you have experience in Node.js/JavaScript development, you are more than welcome to contribute in this project. Especially when it comes to good practice in clean code architecture and scaling up this kind of code base. Author of this project is professional mobile developer (statically typed, class based languages) and doesn't have great experience with JavaScript development.
+_If you have experience in Node.js/JavaScript development, you are more than welcome to contribute in this project. Especially when it comes to good practice in clean code architecture and scaling up this kind of code base. Author of this project is professional mobile developer (statically typed, class based languages) and doesn't have great experience with JavaScript development._
 
 Current tech stack:
 - [Actions on Google](https://developers.google.com/actions/extending-the-assistant)
@@ -18,6 +18,16 @@ Current tech stack:
 - Node.js - Cloud Function implementation
 
 Structure of project:
-- `/functions` directory contains code for Firebase Cloud Functions
-- `/Dialogflow` directory contains code and data for Dialogflow platform (conversation definitions, actions, intents)
+- `/assets` contains assets (images, descriptions) required for app submission
+- `/functions` contains code for Firebase Cloud Functions
+- `/Dialogflow` contains code and data for Dialogflow platform (conversation definitions, actions, intents)
 
+# TODO
+
+## Testing, installation, deployment instructions
+
+To launch unit tests run  `$ npm test` from `functions/` directory.
+
+## App screenshots
+
+##
