@@ -1,0 +1,48 @@
+{
+  "id": "9d87e786-f42c-40bb-a711-7c8a9df612bb",
+  "name": "log_water",
+  "auto": true,
+  "contexts": [],
+  "responses": [
+    {
+      "resetContexts": false,
+      "action": "log_water",
+      "affectedContexts": [],
+      "parameters": [
+        {
+          "id": "a5f59c31-e560-4c57-8686-c21d48ba0bd4",
+          "required": true,
+          "dataType": "@sys.unit-volume",
+          "name": "water_volume",
+          "value": "$water_volume",
+          "prompts": [
+            {
+              "lang": "en",
+              "value": "How much of water did you drink so far?"
+            },
+            {
+              "lang": "en",
+              "value": "How much of water should I log?"
+            }
+          ],
+          "isList": false
+        }
+      ],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "en",
+          "speech": []
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 500000,
+  "webhookUsed": true,
+  "webhookForSlotFilling": false,
+  "lastUpdate": 1508442034,
+  "fallbackIntent": false,
+  "events": []
+}

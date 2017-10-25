@@ -1,0 +1,77 @@
+[
+  {
+    "id": "f3fd2a0a-173d-4b24-bfa0-c2ce76c5caad",
+    "data": [
+      {
+        "text": "How much did I drink?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "c0b103f2-dbba-46bc-8c0a-3284165149fd",
+    "data": [
+      {
+        "text": "How much water have I drunk ",
+        "userDefined": false
+      },
+      {
+        "text": "today",
+        "meta": "@sys.ignore",
+        "userDefined": false
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "d0b592c3-b46a-4836-86ff-1d80abc7535b",
+    "data": [
+      {
+        "text": "How much water did I drink ",
+        "userDefined": false
+      },
+      {
+        "text": "today",
+        "meta": "@sys.ignore",
+        "userDefined": false
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  },
+  {
+    "id": "b2f8c850-5c3e-4229-9644-33c11352f84b",
+    "data": [
+      {
+        "text": "Did I drink any water ",
+        "userDefined": false
+      },
+      {
+        "text": "today",
+        "meta": "@sys.ignore",
+        "userDefined": false
+      },
+      {
+        "text": "?",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 0
+  }
+]

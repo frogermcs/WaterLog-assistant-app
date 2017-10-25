@@ -1,0 +1,20 @@
+{
+  "name": "water-log",
+  "description": "Daily water logger",
+  "version": "0.0.1",
+  "author": "froger_mcs",
+  "dependencies": {
+    "actions-on-google": "^1.0.0",
+    "firebase": "^4.5.1",
+    "firebase-admin": "~5.4.0",
+    "firebase-functions": "^0.7.0"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*",
+    "sinon": "^4.0.1"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  }
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "dc227fa6-5ff0-4d72-ab9f-687d14fba54c",
+    "data": [
+      {
+        "text": "I have drunk ",
+        "userDefined": false
+      },
+      {
+        "text": "200 milliliters",
+        "alias": "water_volume",
+        "meta": "@sys.unit-volume",
+        "userDefined": false
+      },
+      {
+        "text": " of water",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1508067206
+  },
+  {
+    "id": "57dcac55-a8d9-4a95-9eb9-35e259ce9a2f",
+    "data": [
+      {
+        "text": "Log 1 ",
+        "userDefined": false
+      },
+      {
+        "text": "liter",
+        "alias": "water_volume",
+        "meta": "@sys.unit-volume",
+        "userDefined": true
+      },
+      {
+        "text": " of water",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1508442034
+  },
+  {
+    "id": "724057c5-065d-4c1e-9eec-5e0448601348",
+    "data": [
+      {
+        "text": "Save ",
+        "userDefined": false
+      },
+      {
+        "text": "100 mililiters",
+        "alias": "water_volume",
+        "meta": "@sys.unit-volume",
+        "userDefined": true
+      },
+      {
+        "text": " of water",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1508442034
+  }
+]
