@@ -1,0 +1,18 @@
+# Assistant app introduction
+You can use this app to: track how much water you drink during the day
+
+# Short description
+Track your daily water intake.
+
+# Full description
+Do you know that you should drink about 3 liters of water each day to stay healthy? Now you don't need to pickup your phone and find the app to log each glass of water you drank. Just use voice assistant in your home, smartwatch or phone to track your daily water intake.
+
+This is also an open source project to show how to build voice assistant app. You can find it on Github and as a blog post describing how to build app like this.
+
+Github repository: https://github.com/frogermcs/WaterLog-assistant-app
+
+# Sample invocations
+Ok Google, Talk to WaterLog
+Ok Google, Ask WaterLog how much water have I drunk today?
+Ok Google, Talk to WaterLog to log 1 liter of water
+
