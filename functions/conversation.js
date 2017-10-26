@@ -9,6 +9,7 @@ class Conversation {
         this.waterLog = waterLog;
     }
 
+    //Intent input.welcome
     actionWelcomeUser() {
         return this.userManager.isFirstUsage(this._getCurrentUserId())
             .then(isFirstUsage => {
@@ -36,9 +37,15 @@ class Conversation {
             });
     }
 
+    //Intent log_water
     actionLogWater() {
+        //Get argument extracted by Dialogflow
         let waterToLog = this.dialogflowApp.getArgument(ARG_WATER_VOLUME);
+        //Save logged water into Firebase Realtime Database
         this.waterLog.saveLoggedWater(this._getCurrentUserId(), waterToLog);
+        //Load sum of logged water for current user and reply user
+        //with how much water he or she logged so far.
+        //End the conversation.
         return this.waterLog.getLoggedWaterForUser(this._getCurrentUserId())
             .then(loggedWater => {
                 this.dialogflowApp.tell(
@@ -51,6 +58,7 @@ class Conversation {
             });
     }
 
+    //Intent get_logged_water
     actionGetLoggedWater() {
         return this.waterLog.getLoggedWaterForUser(this._getCurrentUserId())
             .then(loggedWater => this.dialogflowApp.tell(util.format(Str.WATER_LOGGED_OVERALL, loggedWater)));
