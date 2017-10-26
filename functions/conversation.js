@@ -1,4 +1,4 @@
-const ARG_WATER_WOLUME = 'water_volume';
+const ARG_WATER_VOLUME = 'water_volume';
 const Str = require('./strings');
 const util = require('util');
 
@@ -37,7 +37,7 @@ class Conversation {
     }
 
     actionLogWater() {
-        let waterToLog = this.dialogflowApp.getArgument(ARG_WATER_WOLUME);
+        let waterToLog = this.dialogflowApp.getArgument(ARG_WATER_VOLUME);
         this.waterLog.saveLoggedWater(this._getCurrentUserId(), waterToLog);
         return this.waterLog.getLoggedWaterForUser(this._getCurrentUserId())
             .then(loggedWater => {
