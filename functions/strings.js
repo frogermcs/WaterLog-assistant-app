@@ -11,6 +11,6 @@ module.exports = {
         `How much water did you drink since last time?`,
         `See you later!`
     ],
-    WATER_LOGGED_NOW: `Ok, I’ve added %s%s of water to your daily log. In sum you have drunk $sml today. Let me know when you drink more! See you later.`,
+    WATER_LOGGED_NOW: `Ok, I’ve added %s%s of water to your daily log. In sum you have drunk %sml today. Let me know when you drink more! See you later.`,
     WATER_LOGGED_OVERALL: `In sum you have drunk %sml today. Let me know when you drink more! See you later.`
 };
