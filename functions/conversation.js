@@ -18,7 +18,7 @@ class Conversation {
                     this.userManager.saveAssistantUser(this._getCurrentUserId());
                     this._greetNewUser();
                 } else {
-                    this._greetExistingUser();
+                    return this._greetExistingUser();
                 }
 
                 return isFirstUsage;
@@ -30,11 +30,21 @@ class Conversation {
     }
 
     _greetExistingUser() {
-        this.waterLog.getLoggedWaterForUser(this._getCurrentUserId())
-            .then(loggedWater => {
+        const loggedWaterPromise = this.waterLog.getLoggedWaterForUser(this._getCurrentUserId());
+        const userNamePromise = this.userManager.loadAssistantUser(this._getCurrentUserId());
+
+        return Promise.all([loggedWaterPromise, userNamePromise])
+            .then(values => {
+                const loggedWater = values[0];
+                const userGivenName = values[1].givenName;
+                let formattedName = '';
+                if (userGivenName) {
+                    formattedName = ' ' + userGivenName;
+                }
                 this.dialogflowApp.ask(
-                    util.format(Str.GREETING_EXISTING_USER, loggedWater),
-                    Str.GREETING_EXISTING_USER_NO_INPUT_PROMPT);
+                    util.format(Str.GREETING_EXISTING_USER, formattedName, loggedWater),
+                    Str.GREETING_EXISTING_USER_NO_INPUT_PROMPT
+                );
             });
     }
 

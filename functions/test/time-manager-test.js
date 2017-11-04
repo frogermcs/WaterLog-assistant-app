@@ -19,9 +19,6 @@ describe('TimeManager', () => {
         sinon.stub(userManagerInstance, 'ensureAuthUser').returns(Promise.resolve(true));
     });
 
-    afterEach(() => {
-    });
-
     describe('getPlatformTime', () => {
         const expectedTimezone = 'Europe/Paris';
         const expectedTime = '13:37';
@@ -97,8 +94,6 @@ describe('TimeManager', () => {
     describe('getTodayStartTimestampForAssistantUser', () => {
         const expectedPlatformTimezone = 'Europe/Paris';
         const expectedUserTimeData = {timezone: 'America/New_York'};
-        const expectedPlatformTime = '13:37';
-        const expectedUserTime = '8:37';
         const expectedUserId = 'abc123';
 
         const expectedDate = new Date('2017-11-04T04:00:00.000Z');

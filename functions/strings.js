@@ -5,7 +5,7 @@ module.exports = {
         'Please tell me how much water did you drink.',
         'See you later!'
     ],
-    GREETING_EXISTING_USER: `Hey! You have drunk %sml today. How much water should I add now?`,
+    GREETING_EXISTING_USER: `Hey%s! You have drunk %sml today. How much water should I add now?`,
     GREETING_EXISTING_USER_NO_INPUT_PROMPT: [
         `How much water did you drink since last time?`,
         `How much water did you drink since last time?`,

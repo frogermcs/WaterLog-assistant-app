@@ -8,6 +8,10 @@ const TimeManager = require('../time-manager.js');
 const Str = require('../strings');
 const util = require('util');
 
+const {
+    exampleUser
+} = require('./utils/mocking');
+
 describe('Conversation', () => {
     let conversationInstance;
     let dialogFlowAppInstance;
@@ -15,23 +19,24 @@ describe('Conversation', () => {
     let waterLogInstance;
     let timeManagerInstance;
 
-    const expectedUser = {userId: "abc123"};
-
     before(() => {
         dialogFlowAppInstance = new DialogflowApp();
+        //Set supported permissions (normally initlialised in Dialogflow c-tor)
+        dialogFlowAppInstance.SupportedPermissions = {
+            NAME: 'NAME',
+            DEVICE_PRECISE_LOCATION: 'DEVICE_PRECISE_LOCATION',
+            DEVICE_COARSE_LOCATION: 'DEVICE_COARSE_LOCATION'
+        };
+
         userManagerInstance = new UserManager();
         waterLogInstance = new WaterLog();
         timeManagerInstance = new TimeManager();
         conversationInstance = new Conversation(dialogFlowAppInstance, userManagerInstance, waterLogInstance, timeManagerInstance);
 
-        sinon.stub(dialogFlowAppInstance, 'getUser').returns(expectedUser);
+        sinon.stub(dialogFlowAppInstance, 'getUser').returns(exampleUser);
     });
 
     describe('actionWelcomeUser', () => {
-        before(() => {
-
-        });
-
         it('Should create new anonymous user', (done) => {
             const userManagerStub = sinon.stub(userManagerInstance, 'isFirstUsage').resolves(true);
             const userManagerMock = sinon.mock(userManagerInstance);
@@ -39,7 +44,7 @@ describe('Conversation', () => {
 
             userManagerMock
                 .expects('saveAssistantUser')
-                .once().withArgs(expectedUser.userId);
+                .once().withArgs(exampleUser.userId);
 
             conversationInstance.actionWelcomeUser().then(() => {
                 userManagerMock.verify();
@@ -52,7 +57,7 @@ describe('Conversation', () => {
 
         it('Should greet new user', (done) => {
             const userManagerStub = sinon.stub(userManagerInstance, 'isFirstUsage').resolves(true);
-            const userManagerStub2 = sinon.stub(userManagerInstance, 'saveAssistantUser').returns();
+            const userManagerStub2 = sinon.stub(userManagerInstance, 'saveAssistantUser');
             const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance);
             dialogFlowAppMock
                 .expects('ask')
@@ -68,23 +73,58 @@ describe('Conversation', () => {
             });
         });
 
-        it('Should greet existing user', (done) => {
+        it('Should greet existing user with name if exists', (done) => {
             const expectedLoggedWater = 100;
+
+            const expectedFormattedName = ' ' + exampleUser.givenName;
             const userManagerStub = sinon.stub(userManagerInstance, 'isFirstUsage').resolves(false);
             const waterLogStub = sinon.stub(waterLogInstance, 'getLoggedWaterForUser').resolves(expectedLoggedWater);
             const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance);
+            const loadAssistantUserStub = sinon.stub(userManagerInstance, 'loadAssistantUser').resolves(exampleUser);
 
             dialogFlowAppMock
                 .expects('ask')
-                .once().withArgs(
-                util.format(Str.GREETING_EXISTING_USER, expectedLoggedWater),
-                Str.GREETING_EXISTING_USER_NO_INPUT_PROMPT
-            ).returns(true);
+                .once()
+                .withArgs(
+                    util.format(Str.GREETING_EXISTING_USER, expectedFormattedName, expectedLoggedWater),
+                    Str.GREETING_EXISTING_USER_NO_INPUT_PROMPT
+                )
+                .returns(true);
 
             conversationInstance.actionWelcomeUser().then(() => {
                 dialogFlowAppMock.verify();
                 done();
 
+                loadAssistantUserStub.restore();
+                userManagerStub.restore();
+                waterLogStub.restore();
+            });
+        });
+
+        it('Should greet existing user with general message if name doesnt exists', (done) => {
+            const expectedLoggedWater = 100;
+
+            const expectedFormattedName = '';
+            const userManagerStub = sinon.stub(userManagerInstance, 'isFirstUsage').resolves(false);
+            const waterLogStub = sinon.stub(waterLogInstance, 'getLoggedWaterForUser').resolves(expectedLoggedWater);
+            const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance);
+            const loadAssistantUserStub = sinon.stub(userManagerInstance, 'loadAssistantUser').resolves({userId: "123"});
+
+            dialogFlowAppMock
+                .expects('ask')
+                .once()
+                .withArgs(
+                    util.format(Str.GREETING_EXISTING_USER, expectedFormattedName, expectedLoggedWater),
+                    Str.GREETING_EXISTING_USER_NO_INPUT_PROMPT
+                )
+                .returns(true);
+
+            conversationInstance.actionWelcomeUser().then(() => {
+                dialogFlowAppMock.verify();
+                done();
+
+                dialogFlowAppMock.restore();
+                loadAssistantUserStub.restore();
                 userManagerStub.restore();
                 waterLogStub.restore();
             });
@@ -106,6 +146,7 @@ describe('Conversation', () => {
                 dialogFlowAppMock.verify();
                 done();
 
+                dialogFlowAppMock.restore();
                 waterLogStub.restore();
             });
         });
@@ -136,28 +177,21 @@ describe('Conversation', () => {
 
             waterLogMock
                 .expects('saveLoggedWater')
-                .once().withArgs(expectedUser.userId, expectedLoggedWaterBefore);
+                .once().withArgs(exampleUser.userId, expectedLoggedWaterBefore);
 
             conversationInstance.actionLogWater().then(() => {
                 dialogFlowAppMock.verify();
                 waterLogMock.verify();
                 done();
 
+                dialogFlowAppMock.restore();
+                waterLogMock.restore();
                 waterLogStub.restore();
             });
         });
     });
 
     describe('actionUpdateSettings', () => {
-        before(() => {
-            //Set supported permissions (normally initlialised in Dialogflow c-tor)
-            dialogFlowAppInstance.SupportedPermissions = {
-                NAME: 'NAME',
-                DEVICE_PRECISE_LOCATION: 'DEVICE_PRECISE_LOCATION',
-                DEVICE_COARSE_LOCATION: 'DEVICE_COARSE_LOCATION'
-            };
-        });
-
         it('Should ask for user name permission', (done) => {
             const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance)
                 .expects('askForPermission')
@@ -174,15 +208,6 @@ describe('Conversation', () => {
     });
 
     describe('actionUserData', () => {
-        before(() => {
-            //Set supported permissions (normally initlialised in Dialogflow c-tor)
-            dialogFlowAppInstance.SupportedPermissions = {
-                NAME: 'NAME',
-                DEVICE_PRECISE_LOCATION: 'DEVICE_PRECISE_LOCATION',
-                DEVICE_COARSE_LOCATION: 'DEVICE_COARSE_LOCATION'
-            };
-        });
-
         it('Should finish with permission denied when permission isnt granted', (done) => {
             const permissionGrantedStub = sinon.stub(dialogFlowAppInstance, 'isPermissionGranted').returns(false);
             const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance)
@@ -203,6 +228,7 @@ describe('Conversation', () => {
             const permissionGrantedStub = sinon.stub(dialogFlowAppInstance, 'isPermissionGranted').returns(true);
             const userNameStub = sinon.stub(dialogFlowAppInstance, 'getUserName').returns(null);
             const deviceLocationStub = sinon.stub(dialogFlowAppInstance, 'getDeviceLocation').returns(null);
+
             const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance)
                 .expects('tell')
                 .once().withArgs(Str.PERMISSIONS_UNEXPECTED_ISSUES)
@@ -220,22 +246,18 @@ describe('Conversation', () => {
         });
 
         it('Should ask for precise location permission when permission granted, name exists but location doesnt', (done) => {
-            const expectedUserName = {
-                displayName: 'expectedDisplayName',
-                givenName: 'expectedGivenName',
-                familyName: 'expectedFamilyName'
-            };
+            const permissionGrantedStub = sinon.stub(dialogFlowAppInstance, 'isPermissionGranted').returns(true);
+            const userNameStub = sinon.stub(dialogFlowAppInstance, 'getUserName').returns(exampleUser);
+            const deviceLocationStub = sinon.stub(dialogFlowAppInstance, 'getDeviceLocation').returns(null);
+
             const expectedPlatformTime = "13:37";
             const getPlatformTimeStub = sinon.stub(timeManagerInstance, 'getPlatformTime').resolves(expectedPlatformTime);
             const saveAssistantUserNameStub = sinon.stub(userManagerInstance, 'saveAssistantUserName').resolves(expectedPlatformTime);
 
-            const permissionGrantedStub = sinon.stub(dialogFlowAppInstance, 'isPermissionGranted').returns(true);
-            const userNameStub = sinon.stub(dialogFlowAppInstance, 'getUserName').returns(expectedUserName);
-            const deviceLocationStub = sinon.stub(dialogFlowAppInstance, 'getDeviceLocation').returns(null);
             const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance)
                 .expects('askForPermission')
                 .once().withArgs(
-                    util.format(Str.PERMISSIONS_ASK_FOR_LOCATION, expectedUserName.givenName, expectedPlatformTime),
+                    util.format(Str.PERMISSIONS_ASK_FOR_LOCATION, exampleUser.givenName, expectedPlatformTime),
                     dialogFlowAppInstance.SupportedPermissions.DEVICE_PRECISE_LOCATION
                 )
                 .returns();
@@ -254,26 +276,21 @@ describe('Conversation', () => {
         });
 
         it('Should save user name when permission granted and name exists', (done) => {
-            const expectedUserName = {
-                displayName: 'expectedDisplayName',
-                givenName: 'expectedGivenName',
-                familyName: 'expectedFamilyName'
-            };
-            const expectedPlatformTime = "13:37";
-
             const permissionGrantedStub = sinon.stub(dialogFlowAppInstance, 'isPermissionGranted').returns(true);
-            const userNameStub = sinon.stub(dialogFlowAppInstance, 'getUserName').returns(expectedUserName);
+            const userNameStub = sinon.stub(dialogFlowAppInstance, 'getUserName').returns(exampleUser);
             const deviceLocationStub = sinon.stub(dialogFlowAppInstance, 'getDeviceLocation').returns(null);
+
+            const expectedPlatformTime = "13:37";
             const dialogFlowAppStub = sinon.stub(dialogFlowAppInstance, 'askForPermission').resolves(true);
             const getPlatformTimeStub = sinon.stub(timeManagerInstance, 'getPlatformTime').resolves(expectedPlatformTime);
+
             const userManagerMock = sinon.mock(userManagerInstance)
                 .expects('saveAssistantUserName')
-                .once().withArgs(expectedUser.userId, expectedUserName)
+                .once().withArgs(exampleUser.userId, exampleUser)
                 .returns(Promise.resolve(true));
 
             conversationInstance.actionUserData().then(() => {
                 userManagerMock.verify();
-
                 done();
 
                 userManagerMock.restore();
@@ -286,26 +303,21 @@ describe('Conversation', () => {
         });
 
         it('Should save user timezone and finish when permission granted, name exists and location exists', (done) => {
-            const expectedUserName = {
-                displayName: 'expectedDisplayName',
-                givenName: 'expectedGivenName',
-                familyName: 'expectedFamilyName'
-            };
             const expectedPlatformTime = "13:37";
             const expectedDeviceLocation = {coordinates: {latitude: 37.4265994, longitude: -122.08058050000001}};
             const expectedTimezone = 'America/Los_Angeles';
 
-            const saveAssistantUserNameStub = sinon.stub(userManagerInstance, 'saveAssistantUserName').resolves(expectedPlatformTime);
             const permissionGrantedStub = sinon.stub(dialogFlowAppInstance, 'isPermissionGranted').returns(true);
-            const userNameStub = sinon.stub(dialogFlowAppInstance, 'getUserName').returns(expectedUserName);
+            const userNameStub = sinon.stub(dialogFlowAppInstance, 'getUserName').returns(exampleUser);
             const deviceLocationStub = sinon.stub(dialogFlowAppInstance, 'getDeviceLocation').returns(expectedDeviceLocation);
 
+            const saveAssistantUserNameStub = sinon.stub(userManagerInstance, 'saveAssistantUserName').resolves(expectedPlatformTime);
             const getTimeZoneFromCoordinatesStub = sinon.stub(timeManagerInstance, 'getTimeZoneFromCoordinates');
             getTimeZoneFromCoordinatesStub.withArgs(expectedDeviceLocation.coordinates).returns(expectedTimezone);
 
             const timeManagerMock = sinon.mock(timeManagerInstance)
                 .expects('saveAssistantUserTimezone')
-                .once().withArgs(expectedUser.userId, expectedTimezone)
+                .once().withArgs(exampleUser.userId, expectedTimezone)
                 .resolves(true);
 
             const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance)

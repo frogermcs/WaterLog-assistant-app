@@ -43,7 +43,7 @@ const MockResponse = class {
 
 const basicHeaderRequest = {
     "content-type": "application/json; charset=UTF-8",
-}
+};
 
 const basicBodyRequest = {
     "originalRequest": {
@@ -209,9 +209,17 @@ const basicBodyRequest = {
     "sessionId": "1508455291994"
 };
 
+const exampleUser = {
+    userId: "abc123",
+    displayName: 'expectedDisplayName',
+    givenName: 'expectedGivenName',
+    familyName: 'expectedFamilyName'
+};
+
 module.exports = {
     MockRequest,
     MockResponse,
     basicHeaderRequest,
-    basicBodyRequest
+    basicBodyRequest,
+    exampleUser
 };
