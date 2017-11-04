@@ -1,9 +1,8 @@
-const Utils = require('./utils');
-
 class WaterLog {
-    constructor(firebase, userManager) {
+    constructor(firebase, userManager, timeManager) {
         this.firebase = firebase;
         this.userManager = userManager;
+        this.timeManager = timeManager;
     }
 
     saveLoggedWater(assistantUserId, loggedWater) {
@@ -37,13 +36,14 @@ class WaterLog {
                 .once('value');
         }).then(waterLogs => {
             let loggedMililiters = 0;
-            let todayStartsAt = Utils.getTodayStartTimestamp();
-            waterLogs.forEach(waterLog => {
-                if (waterLog.val().timestamp >= todayStartsAt) {
-                    loggedMililiters += waterLog.val().mililiters;
-                }
+            return this.timeManager.getTodayStartTimestampForAssistantUser(assistantUserId).then(todayStartsAt => {
+                waterLogs.forEach(waterLog => {
+                    if (waterLog.val().timestamp >= todayStartsAt) {
+                        loggedMililiters += waterLog.val().mililiters;
+                    }
+                });
+                return loggedMililiters;
             });
-            return loggedMililiters;
         });
     }
 }

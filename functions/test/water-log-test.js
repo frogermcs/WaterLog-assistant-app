@@ -3,19 +3,21 @@ const chai = require('chai');
 
 const WaterLog = require('../water-log.js');
 const UserManager = require('../user-manager.js');
-const Utils = require('../utils');
+const TimeManager = require('../time-manager.js');
 const firebase = require('firebase');
 const functions = require('firebase-functions');
 
 describe('WaterLog', () => {
     let userManagerInstance;
     let waterLogInstance;
+    let timeManagerInstance;
 
     const userId = "abc123";
 
     before(() => {
         userManagerInstance = new UserManager();
-        waterLogInstance = new WaterLog(firebase, userManagerInstance);
+        timeManagerInstance = new TimeManager();
+        waterLogInstance = new WaterLog(firebase, userManagerInstance, timeManagerInstance);
         sinon.stub(userManagerInstance, 'ensureAuthUser').returns(Promise.resolve(true));
     });
 
@@ -93,7 +95,7 @@ describe('WaterLog', () => {
             const refStub = sinon.stub().withArgs('waterLogs').returns({orderByChild: orderByChildStub});
             const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
 
-            const todayStartTimestampStub = sinon.stub(Utils, 'getTodayStartTimestamp').returns(timestampMidnight);
+            const todayStartTimestampStub = sinon.stub(timeManagerInstance, 'getTodayStartTimestampForAssistantUser').resolves(timestampMidnight);
 
             waterLogInstance.getLoggedWaterForUser(userId).then(loggedMililiters => {
                 chai.assert.equal(50, loggedMililiters);

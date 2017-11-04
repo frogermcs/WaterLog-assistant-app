@@ -52,6 +52,8 @@ describe('Cloud Functions', () => {
             actionMap.set(Actions.ACTION_WELCOME, () => conversation.actionWelcomeUser());
             actionMap.set(Actions.ACTION_LOG_WATER, () => conversation.actionLogWater());
             actionMap.set(Actions.ACTION_GET_LOGGED_WATER, () => conversation.actionGetLoggedWater());
+            actionMap.set(Actions.ACTION_UPDATE_SETTINGS, () => conversation.actionUpdateSettings());
+            actionMap.set(Actions.ACTION_USER_DATA, () => conversation.actionUserData());
             const handleRequestSpy = sinon.spy(DialogflowApp.prototype, 'handleRequest');
 
             waterLogFunctions.waterLog(mockRequest, mockResponse);
@@ -60,6 +62,7 @@ describe('Cloud Functions', () => {
             actionMap.forEach((value, key) => {
                 chai.assert.equal(args.get(key).toString(), value.toString());
             });
+            chai.assert.equal(args.size, actionMap.size);
 
             done();
 

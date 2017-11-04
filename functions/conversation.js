@@ -3,10 +3,11 @@ const Str = require('./strings');
 const util = require('util');
 
 class Conversation {
-    constructor(dialogflowApp, userManager, waterLog) {
+    constructor(dialogflowApp, userManager, waterLog, timeManager) {
         this.dialogflowApp = dialogflowApp;
         this.userManager = userManager;
         this.waterLog = waterLog;
+        this.timeManager = timeManager;
     }
 
     //Intent input.welcome
@@ -62,6 +63,63 @@ class Conversation {
     actionGetLoggedWater() {
         return this.waterLog.getLoggedWaterForUser(this._getCurrentUserId())
             .then(loggedWater => this.dialogflowApp.tell(util.format(Str.WATER_LOGGED_OVERALL, loggedWater)));
+    }
+
+    //Intent update_settings
+    actionUpdateSettings() {
+        this._askForUserName();
+    }
+
+    _askForUserName() {
+        const permission = this.dialogflowApp.SupportedPermissions.NAME;
+        this.dialogflowApp.askForPermission(Str.PERMISSIONS_ASK_FOR_NAME, permission);
+    }
+
+    _askForUserPreciseLocation(userName) {
+        const permission = this.dialogflowApp.SupportedPermissions.DEVICE_PRECISE_LOCATION;
+        return this.timeManager.getPlatformTime().then(platformTime => {
+            this.dialogflowApp.askForPermission(
+                util.format(Str.PERMISSIONS_ASK_FOR_LOCATION, userName, platformTime),
+                permission
+            );
+        })
+    }
+
+    //Intent user_data
+    actionUserData() {
+        if (this.dialogflowApp.isPermissionGranted()) {
+            const userName = this.dialogflowApp.getUserName();
+            if (userName) {
+                this.userManager.saveAssistantUserName(this._getCurrentUserId(), userName);
+                const deviceLocation = this.dialogflowApp.getDeviceLocation();
+                if (deviceLocation) {
+                    return this._setupUserTimezoneAndFinish(deviceLocation);
+                } else {
+                    return this._askForUserPreciseLocation(userName.givenName)
+                }
+            } else {
+                this._finishWithUnexpectedProblems();
+            }
+        } else {
+            this._finishWithPermissionsDenied();
+        }
+
+        return Promise.resolve(true);
+    }
+
+    _setupUserTimezoneAndFinish(deviceLocation) {
+        const timezone = this.timeManager.getTimeZoneFromCoordinates(deviceLocation.coordinates);
+        return this.timeManager.saveAssistantUserTimezone(this._getCurrentUserId(), timezone).then(() => {
+            this.dialogflowApp.tell(Str.SETTINGS_UPDATE);
+        });
+    }
+
+    _finishWithUnexpectedProblems() {
+        this.dialogflowApp.tell(Str.PERMISSIONS_UNEXPECTED_ISSUES);
+    }
+
+    _finishWithPermissionsDenied() {
+        this.dialogflowApp.tell(Str.PERMISSIONS_DENIED);
     }
 
     _getCurrentUserId() {

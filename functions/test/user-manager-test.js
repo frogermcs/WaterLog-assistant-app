@@ -55,6 +55,32 @@ describe('UserManager', () => {
 
     });
 
+    describe('loadAssistantUser', () => {
+        const expectedUserId = "abc123"
+        const expectedUser = {
+            userId: expectedUserId,
+            displayName: "expectedDisplayName",
+            givenName: "expectedGivenName",
+            familyName: "expectedFamilyName",
+        };
+
+        it('Shouldnt load expected user from DB', (done) => {
+            const dataUserExists = new functions.database.DeltaSnapshot(null, null, null, expectedUser);
+            const fakeEvent = {data: dataUserExists};
+            const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
+            const refStub = sinon.stub().withArgs('users/' + expectedUserId).returns({once: onceStub});
+            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+
+            userManagerInstance.loadAssistantUser(expectedUserId).then(user => {
+                chai.assert.deepEqual(user, expectedUser);
+                done();
+
+                databaseStub.restore();
+            });
+        });
+
+    });
+
     describe('saveAssistantUser', () => {
         const expectedUserId = "abc123";
 
@@ -65,6 +91,28 @@ describe('UserManager', () => {
 
             userManagerInstance.saveAssistantUser(expectedUserId).then(() => {
                 chai.assert(setSpy.calledWith({userId: expectedUserId}));
+                done();
+
+                databaseStub.restore();
+            });
+        });
+    });
+
+    describe('saveAssistantUserName', () => {
+        const expectedUserId = "abc123"
+        const expectedUserName = {
+            displayName: "expectedDisplayName",
+            givenName: "expectedGivenName",
+            familyName: "expectedFamilyName",
+        };
+
+        it('Should save assistant user name into DB', (done) => {
+            const setSpy = sinon.spy();
+            const refStub = sinon.stub().withArgs('users/' + expectedUserId).returns({set: setSpy});
+            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+
+            userManagerInstance.saveAssistantUserName(expectedUserId, expectedUserName).then(() => {
+                chai.assert(setSpy.calledWith(expectedUserName));
                 done();
 
                 databaseStub.restore();
