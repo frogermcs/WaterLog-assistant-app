@@ -85,16 +85,6 @@ class Conversation {
         this.dialogflowApp.askForPermission(Str.PERMISSIONS_ASK_FOR_NAME, permission);
     }
 
-    _askForUserPreciseLocation(userName) {
-        const permission = this.dialogflowApp.SupportedPermissions.DEVICE_PRECISE_LOCATION;
-        return this.timeManager.getPlatformTime().then(platformTime => {
-            this.dialogflowApp.askForPermission(
-                util.format(Str.PERMISSIONS_ASK_FOR_LOCATION, userName, platformTime),
-                permission
-            );
-        })
-    }
-
     //Intent user_data
     actionUserData() {
         if (this.dialogflowApp.isPermissionGranted()) {
@@ -122,6 +112,16 @@ class Conversation {
         return this.timeManager.saveAssistantUserTimezone(this._getCurrentUserId(), timezone).then(() => {
             this.dialogflowApp.tell(Str.SETTINGS_UPDATE);
         });
+    }
+
+    _askForUserPreciseLocation(userName) {
+        const permission = this.dialogflowApp.SupportedPermissions.DEVICE_PRECISE_LOCATION;
+        return this.timeManager.getPlatformTime().then(platformTime => {
+            this.dialogflowApp.askForPermission(
+                util.format(Str.PERMISSIONS_ASK_FOR_LOCATION, userName, platformTime),
+                permission
+            );
+        })
     }
 
     _finishWithUnexpectedProblems() {
