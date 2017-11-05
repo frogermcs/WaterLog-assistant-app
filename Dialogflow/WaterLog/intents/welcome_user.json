@@ -1,12 +1,12 @@
 {
-  "id": "5cbc8cea-6ae1-48b7-a7be-95b8f2d76cdc",
-  "name": "get_logged_water",
+  "id": "883cceb6-2005-4b04-adeb-7febd81f1a24",
+  "name": "welcome_user",
   "auto": true,
   "contexts": [],
   "responses": [
     {
       "resetContexts": false,
-      "action": "get_logged_water",
+      "action": "input.welcome",
       "affectedContexts": [],
       "parameters": [],
       "messages": [
@@ -23,7 +23,14 @@
   "priority": 500000,
   "webhookUsed": true,
   "webhookForSlotFilling": false,
-  "lastUpdate": 1509656763434,
+  "lastUpdate": 1509656763429,
   "fallbackIntent": false,
-  "events": []
+  "events": [
+    {
+      "name": "WELCOME"
+    },
+    {
+      "name": "GOOGLE_ASSISTANT_WELCOME"
+    }
+  ]
 }

@@ -1,12 +1,12 @@
 {
-  "id": "5cbc8cea-6ae1-48b7-a7be-95b8f2d76cdc",
-  "name": "get_logged_water",
+  "id": "01c85c57-6c8d-480c-a017-ddfad8812c65",
+  "name": "user_data",
   "auto": true,
   "contexts": [],
   "responses": [
     {
       "resetContexts": false,
-      "action": "get_logged_water",
+      "action": "user_data",
       "affectedContexts": [],
       "parameters": [],
       "messages": [
@@ -23,7 +23,11 @@
   "priority": 500000,
   "webhookUsed": true,
   "webhookForSlotFilling": false,
-  "lastUpdate": 1509656763434,
+  "lastUpdate": 1509890949787,
   "fallbackIntent": false,
-  "events": []
+  "events": [
+    {
+      "name": "actions_intent_PERMISSION"
+    }
+  ]
 }

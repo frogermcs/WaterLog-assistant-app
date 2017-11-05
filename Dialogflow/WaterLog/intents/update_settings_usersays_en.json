@@ -1,0 +1,74 @@
+[
+  {
+    "id": "048303f0-f6dd-4108-bd29-70e26545b116",
+    "data": [
+      {
+        "text": "Personalise experience",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1509698507
+  },
+  {
+    "id": "26ddff28-74c1-4899-b239-e02456cf3350",
+    "data": [
+      {
+        "text": "Personalise",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1509698507
+  },
+  {
+    "id": "91981ef6-dedc-49e3-a308-3e7361423f69",
+    "data": [
+      {
+        "text": "Update settings",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1509698507
+  },
+  {
+    "id": "f57be89c-7d9d-40a9-b79d-ce3b723bffa5",
+    "data": [
+      {
+        "text": "Setup",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1509698507
+  },
+  {
+    "id": "c380f5c8-42f0-46ed-af06-999321835905",
+    "data": [
+      {
+        "text": "Personalise settings",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1509698507
+  },
+  {
+    "id": "b6c4d83b-08a1-417d-b75e-4e9bcdefaa4e",
+    "data": [
+      {
+        "text": "Change settings",
+        "userDefined": false
+      }
+    ],
+    "isTemplate": false,
+    "count": 0,
+    "updated": 1509698507
+  }
+]

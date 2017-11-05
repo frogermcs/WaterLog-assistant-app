@@ -1,12 +1,12 @@
 {
-  "id": "883cceb6-2005-4b04-adeb-7febd81f1a24",
-  "name": "Default Welcome Intent",
+  "id": "3a53433e-407e-4a11-84ab-235975a9683e",
+  "name": "update_settings",
   "auto": true,
   "contexts": [],
   "responses": [
     {
       "resetContexts": false,
-      "action": "input.welcome",
+      "action": "update_settings",
       "affectedContexts": [],
       "parameters": [],
       "messages": [
@@ -23,14 +23,7 @@
   "priority": 500000,
   "webhookUsed": true,
   "webhookForSlotFilling": false,
-  "lastUpdate": 1508308657,
+  "lastUpdate": 1509890949787,
   "fallbackIntent": false,
-  "events": [
-    {
-      "name": "WELCOME"
-    },
-    {
-      "name": "GOOGLE_ASSISTANT_WELCOME"
-    }
-  ]
+  "events": []
 }
