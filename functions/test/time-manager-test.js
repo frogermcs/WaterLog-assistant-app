@@ -18,18 +18,19 @@ describe('TimeManager', () => {
         const expectedTimezone = 'Europe/Paris';
         const expectedTime = '13:37';
 
-        it('Should return platform time', (done) => {
+        it('Should return platform time', () => {
             const formatStub = sinon.stub().withArgs('h:mm a').returns(expectedTime);
-            const guessStub = sinon.stub().returns(expectedTimezone);
-            const momentStub = sinon.stub(moment, 'tz');
-            momentStub.returns({guess: guessStub});
-            momentStub.withArgs(expectedTimezone).returns({format: formatStub});
+            const guessStub = sinon.stub(moment.tz, 'guess');
+            const tzStub = sinon.stub(moment, 'tz');
 
-            timeManagerInstance.getPlatformTime().then(platformTime => {
+            guessStub.returns(expectedTimezone);
+            tzStub.withArgs(expectedTimezone).returns({format: formatStub});
+
+            return timeManagerInstance.getPlatformTime().then(platformTime => {
                 chai.assert.equal(platformTime, expectedTime);
-                done();
 
-                momentStub.restore();
+                tzStub.restore();
+                guessStub.restore();
             });
         });
     });
@@ -93,7 +94,7 @@ describe('TimeManager', () => {
 
         const expectedDate = new Date('2017-11-04T04:00:00.000Z');
 
-        it('Should return date for start of the day for user timezone if exists', (done) => {
+        it('Should return date for start of the day for user timezone if exists', () => {
             const dataTimezoneExists = new functions.database.DeltaSnapshot(null, null, null, expectedUserTimeData);
             const fakeEvent = {data: dataTimezoneExists};
             const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
@@ -103,18 +104,18 @@ describe('TimeManager', () => {
             const toDateStub = sinon.stub().returns(expectedDate);
             const startOfStub = sinon.stub().withArgs('day').returns({toDate: toDateStub});
             const tzStub = sinon.stub(moment, 'tz');
+
             tzStub.withArgs(expectedUserTimeData.timezone).returns({startOf: startOfStub});
 
-            timeManagerInstance.getTodayStartTimestampForAssistantUser(expectedUserId).then(userTimeData => {
+            return timeManagerInstance.getTodayStartTimestampForAssistantUser(expectedUserId).then(userTimeData => {
                 chai.assert.equal(userTimeData, expectedDate);
-                done();
 
                 databaseStub.restore();
                 tzStub.restore();
             });
         });
 
-        it('Should return start of the day date for platform when user timezone doesnt exist', (done) => {
+        it('Should return start of the day date for platform when user timezone doesnt exist', () => {
             const dataTimezoneNotExists = new functions.database.DeltaSnapshot(null, null, null, null);
             const fakeEvent = {data: dataTimezoneNotExists};
             const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
@@ -123,17 +124,18 @@ describe('TimeManager', () => {
 
             const toDateStub = sinon.stub().returns(expectedDate);
             const startOfStub = sinon.stub().withArgs('day').returns({toDate: toDateStub});
-            const guessStub = sinon.stub().returns(expectedPlatformTimezone);
             const tzStub = sinon.stub(moment, 'tz');
-            tzStub.withArgs(expectedPlatformTimezone).returns({startOf: startOfStub});
-            tzStub.returns({guess: guessStub});
+            const guessStub = sinon.stub(moment.tz, 'guess')
 
-            timeManagerInstance.getTodayStartTimestampForAssistantUser(expectedUserId).then(userTimeData => {
+            guessStub.returns(expectedPlatformTimezone);
+            tzStub.withArgs(expectedPlatformTimezone).returns({startOf: startOfStub});
+
+            return timeManagerInstance.getTodayStartTimestampForAssistantUser(expectedUserId).then(userTimeData => {
                 chai.assert.equal(userTimeData, expectedDate);
-                done();
 
                 databaseStub.restore();
                 tzStub.restore();
+                guessStub.restore();
             });
         });
     });
