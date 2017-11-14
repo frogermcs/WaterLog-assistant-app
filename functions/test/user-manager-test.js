@@ -110,33 +110,4 @@ describe('UserManager', () => {
             });
         });
     });
-
-    describe('ensureAuthUser', () => {
-        const expectedResponse = {user: "user1"};
-
-        it('Should authenticate anonymous user when user isnt authenticated', (done) => {
-            onAuthStateChangedStub.callsArgWith(0, null);
-            const signInAnonymouslyStub = sinon.stub().returns(Promise.resolve(expectedResponse));
-
-            authStub.restore();
-            authStub = sinon.stub(firebase, 'auth').returns({
-                onAuthStateChanged: onAuthStateChangedStub,
-                signInAnonymously: signInAnonymouslyStub
-            });
-
-            userManagerInstance.ensureAuthUser().then(result => {
-                chai.assert.equal(result, expectedResponse.user);
-                done();
-            });
-        });
-
-        it('Should return authenticated user', (done) => {
-            onAuthStateChangedStub.callsArgWith(0, expectedResponse.user);
-
-            userManagerInstance.ensureAuthUser().then(result => {
-                chai.assert.equal(result, expectedResponse.user);
-                done();
-            });
-        });
-    });
 });

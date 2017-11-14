@@ -1,10 +1,9 @@
 class TimeManager {
 
-    constructor(firebase, geoTz, moment, userManager) {
-        this.firebase = firebase;
+    constructor(firebaseAdmin, geoTz, moment) {
+        this.firebaseAdmin = firebaseAdmin;
         this.geoTz = geoTz;
         this.moment = moment;
-        this.userManager = userManager;
     }
 
     getTodayStartTimestampForAssistantUser(assistantUserId) {
@@ -39,8 +38,7 @@ class TimeManager {
     }
 
     _dbRefToAssistantUserTimeDataPromise(assistantUserId) {
-        return this.userManager.ensureAuthUser()
-            .then(() => this.firebase.database().ref('userTime/' + assistantUserId));
+        return Promise.resolve(this.firebaseAdmin.database().ref('userTime/' + assistantUserId));
     }
 }
 

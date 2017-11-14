@@ -1,26 +1,7 @@
 class UserManager {
-    constructor(firebase) {
-        this.firebase = firebase;
+    constructor(firebaseAdmin) {
+        this.firebaseAdmin = firebaseAdmin;
         this.user = null;
-    }
-
-    ensureAuthUser() {
-        if (this.user !== null) {
-            return Promise.resolve(this.user);
-        } else {
-            return new Promise((resolve, reject) => {
-                this.firebase.auth().onAuthStateChanged(user => {
-                    if (user) {
-                        resolve(user);
-                    } else {
-                        this.firebase.auth().signInAnonymously()
-                            .then(result => resolve(result.user))
-                            .catch(error => reject(error));
-                    }
-                });
-            })
-                .then(user => this.user = user)
-        }
     }
 
     isFirstUsage(assistantUserId) {
@@ -49,8 +30,7 @@ class UserManager {
     }
 
     _dbRefToAssistantUserPromise(assistantUserId) {
-        return this.ensureAuthUser()
-            .then(() => this.firebase.database().ref('users/' + assistantUserId));
+        return Promise.resolve(this.firebaseAdmin.database().ref('users/' + assistantUserId));
     }
 }
 

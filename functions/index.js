@@ -3,7 +3,7 @@
 process.env.DEBUG = 'actions-on-google:*';
 const DialogflowApp = require('actions-on-google').DialogflowApp;
 const functions = require('firebase-functions');
-const firebase = require('firebase');
+const firebaseAdmin = require('firebase-admin');
 const geoTz = require('geo-tz');
 const moment = require('moment-timezone');
 const WaterLog = require('./water-log.js');
@@ -12,7 +12,7 @@ const UserManager = require('./user-manager.js');
 const TimeManager = require('./time-manager.js');
 const Actions = require('./assistant-actions');
 
-firebase.initializeApp(functions.config().firebase);
+firebaseAdmin.initializeApp(functions.config().firebase);
 
 exports.waterLog = functions.https.onRequest((request, response) => {
     console.log('Request headers: ' + JSON.stringify(request.headers));
@@ -20,9 +20,9 @@ exports.waterLog = functions.https.onRequest((request, response) => {
 
     //Initialise app dependencies
     const dialogflowApp = new DialogflowApp({request, response});
-    const userManager = new UserManager(firebase);
-    const timeManager = new TimeManager(firebase, geoTz, moment, userManager);
-    const waterLog = new WaterLog(firebase, userManager, timeManager);
+    const userManager = new UserManager(firebaseAdmin);
+    const timeManager = new TimeManager(firebaseAdmin, geoTz, moment);
+    const waterLog = new WaterLog(firebaseAdmin, timeManager);
     const conversation = new Conversation(dialogflowApp, userManager, waterLog, timeManager);
 
     //Define map of Dialogflow agent Intents

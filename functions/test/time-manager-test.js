@@ -2,21 +2,16 @@ const sinon = require('sinon');
 const chai = require('chai');
 
 const TimeManager = require('../time-manager');
-const firebase = require('firebase');
+const firebaseAdmin = require('firebase-admin');
 const geoTz = require('geo-tz');
 const moment = require('moment-timezone');
-const UserManager = require('../user-manager');
 const functions = require('firebase-functions');
 
 describe('TimeManager', () => {
     let timeManagerInstance;
-    let userManagerInstance;
 
     before(() => {
-        userManagerInstance = new UserManager();
-        timeManagerInstance = new TimeManager(firebase, geoTz, moment, userManagerInstance);
-
-        sinon.stub(userManagerInstance, 'ensureAuthUser').returns(Promise.resolve(true));
+        timeManagerInstance = new TimeManager(firebaseAdmin, geoTz, moment);
     });
 
     describe('getPlatformTime', () => {
@@ -60,7 +55,7 @@ describe('TimeManager', () => {
         it('Should save assistant user timezone into DB', (done) => {
             const setSpy = sinon.spy();
             const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({set: setSpy});
-            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
             timeManagerInstance.saveAssistantUserTimezone(expectedUserId, expectedTimezone).then(() => {
                 chai.assert(setSpy.calledWith({timezone: expectedTimezone}));
@@ -80,7 +75,7 @@ describe('TimeManager', () => {
             const fakeEvent = {data: dataTimezoneExists};
             const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
             const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({once: onceStub});
-            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
             timeManagerInstance.getAssistantUserTimeData(expectedUserId).then(userTimeData => {
                 chai.assert.deepEqual(userTimeData, expectedUserTimeData);
@@ -103,7 +98,7 @@ describe('TimeManager', () => {
             const fakeEvent = {data: dataTimezoneExists};
             const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
             const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({once: onceStub});
-            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
             const toDateStub = sinon.stub().returns(expectedDate);
             const startOfStub = sinon.stub().withArgs('day').returns({toDate: toDateStub});
@@ -124,7 +119,7 @@ describe('TimeManager', () => {
             const fakeEvent = {data: dataTimezoneNotExists};
             const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
             const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({once: onceStub});
-            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
             const toDateStub = sinon.stub().returns(expectedDate);
             const startOfStub = sinon.stub().withArgs('day').returns({toDate: toDateStub});

@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const Actions = require('../assistant-actions');
 const Conversation = require('../conversation');
 const DialogflowApp = require('actions-on-google').DialogflowApp;
-const firebase = require('firebase');
+const firebaseAdmin = require('firebase-admin');
 const functions = require('firebase-functions');
 
 const {
@@ -22,7 +22,7 @@ describe('Cloud Functions', () => {
     let waterLogFunctions;
 
     before(() => {
-        firebaseInitStub = sinon.stub(firebase, 'initializeApp');
+        firebaseInitStub = sinon.stub(firebaseAdmin, 'initializeApp');
         configStub = sinon.stub(functions, 'config').returns({
             firebase: {
                 databaseURL: 'https://not-a-project.firebaseio.com',
@@ -47,6 +47,8 @@ describe('Cloud Functions', () => {
             let conversationStub1 = sinon.stub(Conversation.prototype, "actionWelcomeUser");
             let conversationStub2 = sinon.stub(Conversation.prototype, "actionLogWater");
             let conversationStub3 = sinon.stub(Conversation.prototype, "actionGetLoggedWater");
+
+            let conversation = new Conversation();
 
             let actionMap = new Map();
             actionMap.set(Actions.ACTION_WELCOME, () => conversation.actionWelcomeUser());

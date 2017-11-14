@@ -2,9 +2,8 @@ const sinon = require('sinon');
 const chai = require('chai');
 
 const WaterLog = require('../water-log.js');
-const UserManager = require('../user-manager.js');
 const TimeManager = require('../time-manager.js');
-const firebase = require('firebase');
+const firebaseAdmin = require('firebase-admin');
 const functions = require('firebase-functions');
 
 const {
@@ -12,15 +11,12 @@ const {
 } = require('./utils/mocking');
 
 describe('WaterLog', () => {
-    let userManagerInstance;
     let waterLogInstance;
     let timeManagerInstance;
 
     before(() => {
-        userManagerInstance = new UserManager();
         timeManagerInstance = new TimeManager();
-        waterLogInstance = new WaterLog(firebase, userManagerInstance, timeManagerInstance);
-        sinon.stub(userManagerInstance, 'ensureAuthUser').returns(Promise.resolve(true));
+        waterLogInstance = new WaterLog(firebaseAdmin, timeManagerInstance);
     });
 
     describe('saveLoggedWater', () => {
@@ -50,14 +46,13 @@ describe('WaterLog', () => {
             const refStub = sinon.stub();
             refStub.withArgs('waterLogs/' + expectedWaterLogKey).returns({set: setSpy});
             refStub.returns({child: childStub});
-            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
-            waterLogInstance.saveLoggedWater(exampleUser.userId, loggedWaterInput).then(() => {
-                chai.assert(setSpy.calledWith(expectedLoggedWater));
-                done();
+            waterLogInstance.saveLoggedWater(exampleUser.userId, loggedWaterInput);
+            chai.assert(setSpy.calledWith(expectedLoggedWater));
+            done();
 
-                databaseStub.restore();
-            });
+            databaseStub.restore();
         });
 
         it('Should save logged liters of water', (done) => {
@@ -75,15 +70,14 @@ describe('WaterLog', () => {
             const refStub = sinon.stub();
             refStub.withArgs('waterLogs/' + expectedWaterLogKey).returns({set: setSpy});
             refStub.returns({child: childStub});
-            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
-            waterLogInstance.saveLoggedWater(exampleUser.userId, loggedWaterInput).then(() => {
-                chai.assert(setSpy.calledWith(expectedLoggedWater));
-                done();
+            waterLogInstance.saveLoggedWater(exampleUser.userId, loggedWaterInput);
+            chai.assert(setSpy.calledWith(expectedLoggedWater));
+            done();
 
-                dateStub.restore();
-                databaseStub.restore();
-            });
+            dateStub.restore();
+            databaseStub.restore();
         });
     });
 
@@ -103,7 +97,7 @@ describe('WaterLog', () => {
             const equalToStub = sinon.stub().withArgs(exampleUser.userId).returns({once: onceStub});
             const orderByChildStub = sinon.stub().withArgs('userId').returns({equalTo: equalToStub});
             const refStub = sinon.stub().withArgs('waterLogs').returns({orderByChild: orderByChildStub});
-            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
             const todayStartTimestampStub = sinon.stub(timeManagerInstance, 'getTodayStartTimestampForAssistantUser').resolves(timestampMidnight);
 
