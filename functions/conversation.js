@@ -3,11 +3,12 @@ const Str = require('./strings');
 const util = require('util');
 
 class Conversation {
-    constructor(dialogflowApp, userManager, waterLog, timeManager) {
+    constructor(dialogflowApp, userManager, waterLog, timeManager, factsRepository) {
         this.dialogflowApp = dialogflowApp;
         this.userManager = userManager;
         this.waterLog = waterLog;
         this.timeManager = timeManager;
+        this.factsRepository = factsRepository;
     }
 
     //Intent input.welcome
@@ -130,6 +131,19 @@ class Conversation {
 
     _finishWithPermissionsDenied() {
         this.dialogflowApp.tell(Str.PERMISSIONS_DENIED);
+    }
+
+    //Intent facts_drinking_water
+    getFactForDrinkingWater() {
+        const screenAvailable = this.dialogflowApp.hasSurfaceCapability(this.dialogflowApp.SurfaceCapabilities.SCREEN_OUTPUT);
+        const waterFact = this.factsRepository.getRandomWaterFact();
+        let speechResponse;
+        if (screenAvailable) {
+            speechResponse = this.factsRepository.getWaterFactRichResponse(waterFact);
+        } else {
+            speechResponse = this.factsRepository.getWaterFactAudioTextResponse(waterFact);
+        }
+        this.dialogflowApp.tell(speechResponse);
     }
 
     _getCurrentUserId() {

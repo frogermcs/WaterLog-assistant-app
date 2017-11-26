@@ -56,6 +56,7 @@ describe('Cloud Functions', () => {
             actionMap.set(Actions.ACTION_GET_LOGGED_WATER, () => conversation.actionGetLoggedWater());
             actionMap.set(Actions.ACTION_UPDATE_SETTINGS, () => conversation.actionUpdateSettings());
             actionMap.set(Actions.ACTION_USER_DATA, () => conversation.actionUserData());
+            actionMap.set(Actions.ACTION_FACTS_DRINKING_WATER, () => conversation.getFactForDrinkingWater());
             const handleRequestSpy = sinon.spy(DialogflowApp.prototype, 'handleRequest');
 
             waterLogFunctions.waterLog(mockRequest, mockResponse);

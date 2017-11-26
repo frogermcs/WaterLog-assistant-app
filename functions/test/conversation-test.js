@@ -5,6 +5,7 @@ const UserManager = require('../user-manager.js');
 const WaterLog = require('../water-log.js');
 const Conversation = require('../conversation.js');
 const TimeManager = require('../time-manager.js');
+const FactsRepository = require('../facts-repository');
 const Str = require('../strings');
 const util = require('util');
 
@@ -18,6 +19,7 @@ describe('Conversation', () => {
     let userManagerInstance;
     let waterLogInstance;
     let timeManagerInstance;
+    let factsRepositoryInstance;
 
     before(() => {
         dialogFlowAppInstance = new DialogflowApp();
@@ -27,11 +29,22 @@ describe('Conversation', () => {
             DEVICE_PRECISE_LOCATION: 'DEVICE_PRECISE_LOCATION',
             DEVICE_COARSE_LOCATION: 'DEVICE_COARSE_LOCATION'
         };
+        //Set surface capabilities(normally initlialised in Dialogflow c-tor)
+        dialogFlowAppInstance.SurfaceCapabilities = {
+            AUDIO_OUTPUT: 'actions.capability.AUDIO_OUTPUT',
+            SCREEN_OUTPUT: 'actions.capability.SCREEN_OUTPUT'
+        };
 
         userManagerInstance = new UserManager();
         waterLogInstance = new WaterLog();
         timeManagerInstance = new TimeManager();
-        conversationInstance = new Conversation(dialogFlowAppInstance, userManagerInstance, waterLogInstance, timeManagerInstance);
+        factsRepositoryInstance = new FactsRepository();
+        conversationInstance = new Conversation(
+            dialogFlowAppInstance,
+            userManagerInstance,
+            waterLogInstance,
+            timeManagerInstance,
+            factsRepositoryInstance);
 
         sinon.stub(dialogFlowAppInstance, 'getUser').returns(exampleUser);
     });
@@ -339,6 +352,85 @@ describe('Conversation', () => {
                 userNameStub.restore();
                 deviceLocationStub.restore();
             });
+        });
+    });
+
+    describe('getFactForDrinkingWater', () => {
+        it('Should response with audio text when screen isnt available', (done) => {
+            const expectedWaterFacts = Str.WATER_FACT_THE_TELEGRAPH;
+            const expectedSpeechResponse = "response";
+
+            const factsRepositoryMock = sinon.mock(factsRepositoryInstance);
+            factsRepositoryMock
+                .expects('getRandomWaterFact')
+                .once()
+                .returns(expectedWaterFacts);
+            factsRepositoryMock
+                .expects('getWaterFactAudioTextResponse')
+                .once().withArgs(expectedWaterFacts)
+                .returns(expectedSpeechResponse);
+            factsRepositoryMock
+                .expects('getWaterFactRichResponse')
+                .never();
+
+            const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance);
+            dialogFlowAppMock
+                .expects('tell')
+                .once().withArgs(expectedSpeechResponse)
+                .returns(true);
+
+            dialogFlowAppMock
+                .expects('hasSurfaceCapability')
+                .once().withArgs(dialogFlowAppInstance.SurfaceCapabilities.SCREEN_OUTPUT)
+                .returns(false);
+
+            conversationInstance.getFactForDrinkingWater();
+
+            factsRepositoryMock.verify();
+            dialogFlowAppMock.verify();
+            done();
+
+            factsRepositoryMock.restore();
+            dialogFlowAppMock.restore();
+
+        });
+
+        it('Should response with rich card when screen is available', (done) => {
+            const expectedWaterFacts = Str.WATER_FACT_THE_TELEGRAPH;
+            const expectedSpeechResponse = "response";
+            const factsRepositoryMock = sinon.mock(factsRepositoryInstance);
+            factsRepositoryMock
+                .expects('getRandomWaterFact')
+                .once()
+                .returns(expectedWaterFacts);
+            factsRepositoryMock
+                .expects('getWaterFactRichResponse')
+                .once().withArgs(expectedWaterFacts)
+                .returns(expectedSpeechResponse);
+            factsRepositoryMock
+                .expects('getWaterFactAudioTextResponse')
+                .never();
+
+            const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance);
+            dialogFlowAppMock
+                .expects('tell')
+                .once().withArgs(expectedSpeechResponse)
+                .returns(true);
+
+            dialogFlowAppMock
+                .expects('hasSurfaceCapability')
+                .once().withArgs(dialogFlowAppInstance.SurfaceCapabilities.SCREEN_OUTPUT)
+                .returns(true);
+
+            conversationInstance.getFactForDrinkingWater();
+
+            factsRepositoryMock.verify();
+            dialogFlowAppMock.verify();
+            done();
+
+            factsRepositoryMock.restore();
+            dialogFlowAppMock.restore();
+
         });
     });
 });
