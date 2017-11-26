@@ -54,6 +54,7 @@ describe('Conversation', () => {
             const userManagerStub = sinon.stub(userManagerInstance, 'isFirstUsage').resolves(true);
             const userManagerMock = sinon.mock(userManagerInstance);
             const dialogFlowStub = sinon.stub(dialogFlowAppInstance, 'ask').returns(true);
+            const dialogFlowStub2 = sinon.stub(dialogFlowAppInstance, 'hasSurfaceCapability').returns(false);
 
             userManagerMock
                 .expects('saveAssistantUser')
@@ -64,17 +65,51 @@ describe('Conversation', () => {
                 done();
 
                 dialogFlowStub.restore();
+                dialogFlowStub2.restore();
                 userManagerStub.restore();
             });
         });
 
-        it('Should greet new user', (done) => {
+        it('Should greet new user with audio when screen isnt available', (done) => {
             const userManagerStub = sinon.stub(userManagerInstance, 'isFirstUsage').resolves(true);
             const userManagerStub2 = sinon.stub(userManagerInstance, 'saveAssistantUser');
             const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance);
             dialogFlowAppMock
                 .expects('ask')
                 .once().withArgs(Str.GREETING_NEW_USER, Str.GREETING_NEW_USER_NO_INPUT_PROMPT)
+                .returns(true);
+            dialogFlowAppMock
+                .expects('hasSurfaceCapability')
+                .once().withArgs(dialogFlowAppInstance.SurfaceCapabilities.SCREEN_OUTPUT)
+                .returns(false);
+
+            conversationInstance.actionWelcomeUser().then(() => {
+                dialogFlowAppMock.verify();
+                done();
+
+                userManagerStub.restore();
+                userManagerStub2.restore();
+                dialogFlowAppMock.restore();
+            });
+        });
+
+        it('Should greet new user with response and suggestion chips when screen is available', (done) => {
+            const userManagerStub = sinon.stub(userManagerInstance, 'isFirstUsage').resolves(true);
+            const userManagerStub2 = sinon.stub(userManagerInstance, 'saveAssistantUser');
+            const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance);
+
+            const expectedResponse = "expected_response";
+            const addSuggestionsStub = sinon.stub().returns(expectedResponse);
+            const addSimpleResponseStub = sinon.stub().returns({addSuggestions: addSuggestionsStub});
+            const buildRichResponseStub = sinon.stub(dialogFlowAppInstance, 'buildRichResponse').returns({addSimpleResponse: addSimpleResponseStub});
+
+            dialogFlowAppMock
+                .expects('ask')
+                .once().withArgs(expectedResponse)
+                .returns(true);
+            dialogFlowAppMock
+                .expects('hasSurfaceCapability')
+                .once().withArgs(dialogFlowAppInstance.SurfaceCapabilities.SCREEN_OUTPUT)
                 .returns(true);
 
             conversationInstance.actionWelcomeUser().then(() => {
@@ -83,6 +118,8 @@ describe('Conversation', () => {
 
                 userManagerStub.restore();
                 userManagerStub2.restore();
+                buildRichResponseStub.restore();
+                dialogFlowAppMock.restore();
             });
         });
 
@@ -94,6 +131,11 @@ describe('Conversation', () => {
             const waterLogStub = sinon.stub(waterLogInstance, 'getLoggedWaterForUser').resolves(expectedLoggedWater);
             const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance);
             const loadAssistantUserStub = sinon.stub(userManagerInstance, 'loadAssistantUser').resolves(exampleUser);
+
+            dialogFlowAppMock
+                .expects('hasSurfaceCapability')
+                .once().withArgs(dialogFlowAppInstance.SurfaceCapabilities.SCREEN_OUTPUT)
+                .returns(false);
 
             dialogFlowAppMock
                 .expects('ask')
@@ -122,6 +164,11 @@ describe('Conversation', () => {
             const waterLogStub = sinon.stub(waterLogInstance, 'getLoggedWaterForUser').resolves(expectedLoggedWater);
             const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance);
             const loadAssistantUserStub = sinon.stub(userManagerInstance, 'loadAssistantUser').resolves({userId: "123"});
+
+            dialogFlowAppMock
+                .expects('hasSurfaceCapability')
+                .once().withArgs(dialogFlowAppInstance.SurfaceCapabilities.SCREEN_OUTPUT)
+                .returns(false);
 
             dialogFlowAppMock
                 .expects('ask')

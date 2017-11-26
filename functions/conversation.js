@@ -27,7 +27,11 @@ class Conversation {
     }
 
     _greetNewUser() {
-        this.dialogflowApp.ask(Str.GREETING_NEW_USER, Str.GREETING_NEW_USER_NO_INPUT_PROMPT);
+        if (this._isScreenAvailable()) {
+            this._askWithSuggestionChips(Str.GREETING_NEW_USER, Str.GREETING_USER_SUGGESTION_CHIPS)
+        } else {
+            this.dialogflowApp.ask(Str.GREETING_NEW_USER, Str.GREETING_NEW_USER_NO_INPUT_PROMPT);
+        }
     }
 
     _greetExistingUser() {
@@ -42,10 +46,18 @@ class Conversation {
                 if (userGivenName) {
                     formattedName = ' ' + userGivenName;
                 }
-                this.dialogflowApp.ask(
-                    util.format(Str.GREETING_EXISTING_USER, formattedName, loggedWater),
-                    Str.GREETING_EXISTING_USER_NO_INPUT_PROMPT
-                );
+
+                if (this._isScreenAvailable()) {
+                    this._askWithSuggestionChips(
+                        util.format(Str.GREETING_EXISTING_USER, formattedName, loggedWater),
+                        Str.GREETING_USER_SUGGESTION_CHIPS
+                    );
+                } else {
+                    this.dialogflowApp.ask(
+                        util.format(Str.GREETING_EXISTING_USER, formattedName, loggedWater),
+                        Str.GREETING_EXISTING_USER_NO_INPUT_PROMPT
+                    );
+                }
             });
     }
 
@@ -135,10 +147,9 @@ class Conversation {
 
     //Intent facts_drinking_water
     getFactForDrinkingWater() {
-        const screenAvailable = this.dialogflowApp.hasSurfaceCapability(this.dialogflowApp.SurfaceCapabilities.SCREEN_OUTPUT);
         const waterFact = this.factsRepository.getRandomWaterFact();
         let speechResponse;
-        if (screenAvailable) {
+        if (this._isScreenAvailable()) {
             speechResponse = this.factsRepository.getWaterFactRichResponse(waterFact);
         } else {
             speechResponse = this.factsRepository.getWaterFactAudioTextResponse(waterFact);
@@ -148,6 +159,18 @@ class Conversation {
 
     _getCurrentUserId() {
         return this.dialogflowApp.getUser().userId;
+    }
+
+    _isScreenAvailable() {
+        return this.dialogflowApp.hasSurfaceCapability(this.dialogflowApp.SurfaceCapabilities.SCREEN_OUTPUT);
+    }
+
+    _askWithSuggestionChips(speech, suggestions) {
+        this.dialogflowApp.ask(this.dialogflowApp
+            .buildRichResponse()
+            .addSimpleResponse(speech)
+            .addSuggestions(suggestions)
+        );
     }
 }
 
