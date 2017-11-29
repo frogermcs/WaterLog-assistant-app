@@ -1,12 +1,12 @@
 {
-  "id": "343e39ce-93f7-47fe-8052-3f1affa8bfc4",
-  "name": "user_data",
+  "id": "ab8f1ef2-fdb9-443e-9065-eafdc83e11b2",
+  "name": "facts_drinking_water",
   "auto": true,
   "contexts": [],
   "responses": [
     {
       "resetContexts": false,
-      "action": "user_data",
+      "action": "facts_drinking_water",
       "affectedContexts": [],
       "parameters": [],
       "messages": [
@@ -23,11 +23,7 @@
   "priority": 500000,
   "webhookUsed": true,
   "webhookForSlotFilling": false,
-  "lastUpdate": 1509895186402,
+  "lastUpdate": 1511976670,
   "fallbackIntent": false,
-  "events": [
-    {
-      "name": "actions_intent_PERMISSION"
-    }
-  ]
+  "events": []
 }
