@@ -1,6 +1,8 @@
 const sinon = require('sinon');
 const chai = require('chai');
 
+const math = require('mathjs');
+
 const Constants = require('../constants.js');
 const WaterLog = require('../water-log.js');
 const TimeManager = require('../time-manager.js');
@@ -82,7 +84,7 @@ describe('WaterLog', () => {
         });
 
         it('Should save logged fl oz of water', (done) => {
-            const expectedMililiters = Constants.OZ_TO_ML;
+            const expectedMililiters = math.round(Constants.OZ_TO_ML);
             const loggedWaterInput = {unit: "fl oz", amount: 1};
             const expectedLoggedWater = {
                 userId: exampleUser.userId,

@@ -1,4 +1,5 @@
 const Constants = require('./constants.js');
+const math = require('mathjs');
 
 class WaterLog {
     constructor(firebaseAdmin, timeManager) {
@@ -13,7 +14,7 @@ class WaterLog {
         } else if (loggedWater.unit === "ml") {
             mililiters = loggedWater.amount;
         } else if (loggedWater.unit === "fl oz") {
-            mililiters = loggedWater.amount * Constants.OZ_TO_ML;
+            mililiters = math.round(loggedWater.amount * Constants.OZ_TO_ML);
         }
 
         const waterLogData = {
