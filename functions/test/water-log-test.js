@@ -1,6 +1,7 @@
 const sinon = require('sinon');
 const chai = require('chai');
 
+const Constants = require('../constants.js');
 const WaterLog = require('../water-log.js');
 const TimeManager = require('../time-manager.js');
 const firebaseAdmin = require('firebase-admin');
@@ -58,6 +59,31 @@ describe('WaterLog', () => {
         it('Should save logged liters of water', (done) => {
             const expectedMililiters = 1000;
             const loggedWaterInput = {unit: "L", amount: 1};
+            const expectedLoggedWater = {
+                userId: exampleUser.userId,
+                mililiters: expectedMililiters,
+                timestamp: Date.now()
+            };
+
+            const setSpy = sinon.spy();
+            const pushStub = sinon.stub().withArgs().returns({key: expectedWaterLogKey});
+            const childStub = sinon.stub().withArgs('waterLogs').returns({push: pushStub});
+            const refStub = sinon.stub();
+            refStub.withArgs('waterLogs/' + expectedWaterLogKey).returns({set: setSpy});
+            refStub.returns({child: childStub});
+            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
+
+            waterLogInstance.saveLoggedWater(exampleUser.userId, loggedWaterInput);
+            chai.assert(setSpy.calledWith(expectedLoggedWater));
+            done();
+
+            dateStub.restore();
+            databaseStub.restore();
+        });
+
+        it('Should save logged fl oz of water', (done) => {
+            const expectedMililiters = Constants.OZ_TO_ML;
+            const loggedWaterInput = {unit: "fl oz", amount: 1};
             const expectedLoggedWater = {
                 userId: exampleUser.userId,
                 mililiters: expectedMililiters,
