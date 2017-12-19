@@ -43,7 +43,7 @@ class WaterLog {
                         loggedMililiters += waterLog.val().mililiters;
                     }
                 });
-                return loggedMililiters;
+                return math.round(loggedMililiters);
             });
         });
     }
