@@ -5,6 +5,7 @@ const UserManager = require('../user-manager.js');
 const WaterLog = require('../water-log.js');
 const Conversation = require('../conversation.js');
 const TimeManager = require('../time-manager.js');
+const Analytics = require('../analytics.js');
 const FactsRepository = require('../facts-repository');
 const Str = require('../strings');
 const util = require('util');
@@ -20,6 +21,7 @@ describe('Conversation', () => {
     let waterLogInstance;
     let timeManagerInstance;
     let factsRepositoryInstance;
+    let analyticsInstance;
 
     before(() => {
         dialogFlowAppInstance = new DialogflowApp();
@@ -39,14 +41,18 @@ describe('Conversation', () => {
         waterLogInstance = new WaterLog();
         timeManagerInstance = new TimeManager();
         factsRepositoryInstance = new FactsRepository();
+        analyticsInstance = new Analytics();
+
         conversationInstance = new Conversation(
             dialogFlowAppInstance,
             userManagerInstance,
             waterLogInstance,
             timeManagerInstance,
-            factsRepositoryInstance);
+            factsRepositoryInstance,
+            analyticsInstance);
 
         sinon.stub(dialogFlowAppInstance, 'getUser').returns(exampleUser);
+        sinon.stub(analyticsInstance, 'logAgentReply').returns();
     });
 
     describe('actionWelcomeUser', () => {

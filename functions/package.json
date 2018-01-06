@@ -15,7 +15,9 @@
     "firebase-functions": "^0.7.0",
     "geo-tz": "^3.3.3",
     "mathjs": "^3.18.0",
-    "moment-timezone": "^0.5.14"
+    "moment-timezone": "^0.5.14",
+    "dotenv": "^4.0.0",
+    "@google/chatbase": "1.0.0"
   },
   "devDependencies": {
     "chai": "*",

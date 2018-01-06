@@ -3,12 +3,13 @@ const Str = require('./strings');
 const util = require('util');
 
 class Conversation {
-    constructor(dialogflowApp, userManager, waterLog, timeManager, factsRepository) {
+    constructor(dialogflowApp, userManager, waterLog, timeManager, factsRepository, analytics) {
         this.dialogflowApp = dialogflowApp;
         this.userManager = userManager;
         this.waterLog = waterLog;
         this.timeManager = timeManager;
         this.factsRepository = factsRepository;
+        this.analytics = analytics;
     }
 
     //Intent input.welcome
@@ -30,7 +31,7 @@ class Conversation {
         if (this._isScreenAvailable()) {
             this._askWithSuggestionChips(Str.GREETING_NEW_USER, Str.GREETING_USER_SUGGESTION_CHIPS)
         } else {
-            this.dialogflowApp.ask(Str.GREETING_NEW_USER, Str.GREETING_NEW_USER_NO_INPUT_PROMPT);
+            this._ask(Str.GREETING_NEW_USER, Str.GREETING_NEW_USER_NO_INPUT_PROMPT);
         }
     }
 
@@ -53,7 +54,7 @@ class Conversation {
                         Str.GREETING_USER_SUGGESTION_CHIPS
                     );
                 } else {
-                    this.dialogflowApp.ask(
+                    this._ask(
                         util.format(Str.GREETING_EXISTING_USER, formattedName, loggedWater),
                         Str.GREETING_EXISTING_USER_NO_INPUT_PROMPT
                     );
@@ -72,7 +73,7 @@ class Conversation {
         //End the conversation.
         return this.waterLog.getLoggedWaterForUser(this._getCurrentUserId())
             .then(loggedWater => {
-                this.dialogflowApp.tell(
+                this._tell(
                     util.format(Str.WATER_LOGGED_NOW,
                         waterToLog.amount,
                         waterToLog.unit,
@@ -85,7 +86,7 @@ class Conversation {
     //Intent get_logged_water
     actionGetLoggedWater() {
         return this.waterLog.getLoggedWaterForUser(this._getCurrentUserId())
-            .then(loggedWater => this.dialogflowApp.tell(util.format(Str.WATER_LOGGED_OVERALL, loggedWater)));
+            .then(loggedWater => this._tell(util.format(Str.WATER_LOGGED_OVERALL, loggedWater)));
     }
 
     //Intent update_settings
@@ -95,7 +96,7 @@ class Conversation {
 
     _askForUserName() {
         const permission = this.dialogflowApp.SupportedPermissions.NAME;
-        this.dialogflowApp.askForPermission(Str.PERMISSIONS_ASK_FOR_NAME, permission);
+        this._askForPermission(Str.PERMISSIONS_ASK_FOR_NAME, permission);
     }
 
     //Intent user_data
@@ -123,14 +124,14 @@ class Conversation {
     _setupUserTimezoneAndFinish(deviceLocation) {
         const timezone = this.timeManager.getTimeZoneFromCoordinates(deviceLocation.coordinates);
         return this.timeManager.saveAssistantUserTimezone(this._getCurrentUserId(), timezone).then(() => {
-            this.dialogflowApp.tell(Str.SETTINGS_UPDATE);
+            this._tell(Str.SETTINGS_UPDATE);
         });
     }
 
     _askForUserPreciseLocation(userName) {
         const permission = this.dialogflowApp.SupportedPermissions.DEVICE_PRECISE_LOCATION;
         return this.timeManager.getPlatformTime().then(platformTime => {
-            this.dialogflowApp.askForPermission(
+            this._askForPermission(
                 util.format(Str.PERMISSIONS_ASK_FOR_LOCATION, userName, platformTime),
                 permission
             );
@@ -138,11 +139,11 @@ class Conversation {
     }
 
     _finishWithUnexpectedProblems() {
-        this.dialogflowApp.tell(Str.PERMISSIONS_UNEXPECTED_ISSUES);
+        this._tell(Str.PERMISSIONS_UNEXPECTED_ISSUES);
     }
 
     _finishWithPermissionsDenied() {
-        this.dialogflowApp.tell(Str.PERMISSIONS_DENIED);
+        this._tell(Str.PERMISSIONS_DENIED);
     }
 
     //Intent facts_drinking_water
@@ -154,7 +155,7 @@ class Conversation {
         } else {
             speechResponse = this.factsRepository.getWaterFactAudioTextResponse(waterFact);
         }
-        this.dialogflowApp.tell(speechResponse);
+        this._tell(speechResponse);
     }
 
     _getCurrentUserId() {
@@ -163,6 +164,21 @@ class Conversation {
 
     _isScreenAvailable() {
         return this.dialogflowApp.hasSurfaceCapability(this.dialogflowApp.SurfaceCapabilities.SCREEN_OUTPUT);
+    }
+
+    _tell(speechResponse) {
+        this.dialogflowApp.tell(speechResponse);
+        this.analytics.logAgentReply(speechResponse);
+    }
+
+    _ask(inputPrompt, noInputsMsg) {
+        this.dialogflowApp.ask(inputPrompt, noInputsMsg);
+        this.analytics.logAgentReply(inputPrompt);
+    }
+
+    _askForPermission(context, permission) {
+        this.dialogflowApp.askForPermission(context, permission);
+        this.analytics.logAgentReply("Ask for permission: " + context);
     }
 
     _askWithSuggestionChips(speech, suggestions) {

@@ -11,7 +11,11 @@ const Conversation = require('./conversation.js');
 const UserManager = require('./user-manager.js');
 const TimeManager = require('./time-manager.js');
 const FactsRepository = require('./facts-repository');
+const Analytics = require('./analytics');
 const Actions = require('./assistant-actions');
+const ChatbaseFactory = require('@google/chatbase');
+
+require('dotenv').config({path: __dirname + "/.env"});
 
 firebaseAdmin.initializeApp(functions.config().firebase);
 
@@ -25,7 +29,15 @@ exports.waterLog = functions.https.onRequest((request, response) => {
     const timeManager = new TimeManager(firebaseAdmin, geoTz, moment);
     const waterLog = new WaterLog(firebaseAdmin, timeManager);
     const factsRepository = new FactsRepository(dialogflowApp);
-    const conversation = new Conversation(dialogflowApp, userManager, waterLog, timeManager, factsRepository);
+
+    const chatbase = ChatbaseFactory
+        .setApiKey(process.env.MY_CHATBASE_KEY_DEBUG)
+        .setPlatform('GoogleAssistant')
+        .setUserId(dialogflowApp.getUser().userId);
+
+    const analytics = new Analytics(chatbase);
+
+    const conversation = new Conversation(dialogflowApp, userManager, waterLog, timeManager, factsRepository, analytics);
 
     //Define map of Dialogflow agent Intents
     let actionMap = new Map();
@@ -35,6 +47,11 @@ exports.waterLog = functions.https.onRequest((request, response) => {
     actionMap.set(Actions.ACTION_UPDATE_SETTINGS, () => conversation.actionUpdateSettings());
     actionMap.set(Actions.ACTION_USER_DATA, () => conversation.actionUserData());
     actionMap.set(Actions.ACTION_FACTS_DRINKING_WATER, () => conversation.getFactForDrinkingWater());
+
+    analytics.logUserMessage(
+        dialogflowApp.getRawInput(),
+        dialogflowApp.getIntent()
+    );
 
     //Handle request from Dialogflow (will be dispatched into appropriate action defined above)
     dialogflowApp.handleRequest(actionMap);
