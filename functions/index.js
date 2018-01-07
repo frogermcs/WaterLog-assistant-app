@@ -32,7 +32,7 @@ exports.waterLog = functions.https.onRequest((request, response) => {
     const factsRepository = new FactsRepository(dialogflowApp);
 
     const chatbase = ChatbaseFactory
-        .setApiKey(process.env.MY_CHATBASE_KEY_DEBUG)
+        .setApiKey(process.env.MY_CHATBASE_KEY)
         .setPlatform('GoogleAssistant')
         .setUserId(dialogflowApp.getUser().userId);
 
@@ -49,9 +49,6 @@ exports.waterLog = functions.https.onRequest((request, response) => {
     actionMap.set(Actions.ACTION_USER_DATA, () => conversation.actionUserData());
     actionMap.set(Actions.ACTION_FACTS_DRINKING_WATER, () => conversation.getFactForDrinkingWater());
     actionMap.set(Actions.ACTION_DEFAULT_FALLBACK, () => conversation.actionsDefaultMessage());
-
-    console.log(dialogflowApp.getRawInput());
-    console.log(dialogflowApp.getIntent());
 
     analytics.logUserMessage(
         dialogflowApp.getRawInput(),
