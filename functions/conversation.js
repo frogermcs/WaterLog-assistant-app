@@ -158,6 +158,12 @@ class Conversation {
         this._tell(speechResponse);
     }
 
+    //Intent input.unknown
+    actionsDefaultMessage() {
+        const message = Str.DEFAULT_FALLBACK[Math.floor(Math.random() * Str.DEFAULT_FALLBACK.length)];
+        this._ask(message, Str.DEFAULT_FALLBACK);
+    }
+
     _getCurrentUserId() {
         return this.dialogflowApp.getUser().userId;
     }
@@ -187,6 +193,7 @@ class Conversation {
             .addSimpleResponse(speech)
             .addSuggestions(suggestions)
         );
+        this.analytics.logAgentReply(speech);
     }
 }
 

@@ -1,4 +1,5 @@
 const PackageJson = require('./package.json');
+const Actions = require('./assistant-actions');
 
 class Analytics {
 
@@ -7,15 +8,21 @@ class Analytics {
     }
 
     logUserMessage(msg, intent) {
-        this.chatbase
+        let userMessage = this.chatbase
             .newMessage()
             .setMessage(msg)
             .setAsTypeUser()
             .setIntent(intent)
-            .setVersion(PackageJson.version)
-            .send()
+            .setVersion(PackageJson.version);
+
+        if (intent === Actions.ACTION_DEFAULT_FALLBACK) {
+            userMessage = userMessage.setAsNotHandled();
+        } else {
+            userMessage = userMessage.setAsHandled();
+        }
+
+        userMessage.send()
             .then(msg => {
-                console.log(msg);
                 console.log(msg.getCreateResponse());
             })
             .catch(err => console.error(err));
@@ -29,7 +36,6 @@ class Analytics {
             .setVersion(PackageJson.version)
             .send()
             .then(msg => {
-                console.log(msg);
                 console.log(msg.getCreateResponse())
             })
             .catch(err => console.error(err));

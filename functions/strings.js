@@ -49,4 +49,18 @@ module.exports = {
         TITLE_IMG_URL: 'https://firebasestorage.googleapis.com/v0/b/waterlog-3215a.appspot.com/o/healthline.png?alt=media&token=5253db29-df4a-46df-b09a-d00feb1cca61',
         TITLE_IMG: 'healthline.com'
     },
+    DEFAULT_FALLBACK: [
+        'I didn\'t get that. Can you say it again?',
+        'I missed what you said. Say it again?',
+        'Sorry, could you say that again?',
+        'Sorry, can you say that again?',
+        'Can you say that again?',
+        'Sorry, I didn\'t get that.',
+        'Sorry, what was that?',
+        'One more time?',
+        'What was that?',
+        'Say that again?',
+        'I didn\'t get that.',
+        'I missed that.'
+    ]
 };

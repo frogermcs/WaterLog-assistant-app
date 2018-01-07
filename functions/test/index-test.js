@@ -25,11 +25,8 @@ describe('Cloud Functions', () => {
     let chatbaseSetUserIdStub;
     let chatbaseSetPlatformStub;
     let chatbaseSetApiKeyStub;
-    let analyticsStub;
 
     before(() => {
-        //Prevent from sending analytics
-        analyticsStub = sinon.stub(Analytics.prototype, "logUserMessage");
         chatbaseSetUserIdStub = sinon.stub().returns();
         chatbaseSetPlatformStub = sinon.stub().returns({setUserId: chatbaseSetUserIdStub});
         chatbaseSetApiKeyStub = sinon.stub(ChatbaseFactory, 'setApiKey').returns({setPlatform: chatbaseSetPlatformStub});
@@ -53,13 +50,30 @@ describe('Cloud Functions', () => {
     });
 
     describe('waterLog', () => {
-        it('Should displatch Dialogflow actions properly', (done) => {
+        let consoleStub;
+        let conversationStub1;
+        let conversationStub2;
+        let conversationStub3;
+
+        before(() => {
             //Disable console.log temporary
-            let consoleStub = sinon.stub(console, "log");
+            consoleStub = sinon.stub(console, "log");
             //Prevent from warnings
-            let conversationStub1 = sinon.stub(Conversation.prototype, "actionWelcomeUser");
-            let conversationStub2 = sinon.stub(Conversation.prototype, "actionLogWater");
-            let conversationStub3 = sinon.stub(Conversation.prototype, "actionGetLoggedWater");
+            conversationStub1 = sinon.stub(Conversation.prototype, "actionWelcomeUser");
+            conversationStub2 = sinon.stub(Conversation.prototype, "actionLogWater");
+            conversationStub3 = sinon.stub(Conversation.prototype, "actionGetLoggedWater");
+        });
+
+        after(() => {
+            consoleStub.restore();
+            conversationStub1.restore();
+            conversationStub2.restore();
+            conversationStub3.restore();
+        });
+
+        it('Should dispatch Dialogflow actions properly', (done) => {
+            //Prevent from sending analytics
+            const analyticsStub = sinon.stub(Analytics.prototype, "logUserMessage");
 
             let conversation = new Conversation();
 
@@ -70,6 +84,7 @@ describe('Cloud Functions', () => {
             actionMap.set(Actions.ACTION_UPDATE_SETTINGS, () => conversation.actionUpdateSettings());
             actionMap.set(Actions.ACTION_USER_DATA, () => conversation.actionUserData());
             actionMap.set(Actions.ACTION_FACTS_DRINKING_WATER, () => conversation.getFactForDrinkingWater());
+            actionMap.set(Actions.ACTION_DEFAULT_FALLBACK, () => conversation.actionsDefaultMessage());
             const handleRequestSpy = sinon.spy(DialogflowApp.prototype, 'handleRequest');
 
             waterLogFunctions.waterLog(mockRequest, mockResponse);
@@ -82,10 +97,23 @@ describe('Cloud Functions', () => {
 
             done();
 
-            consoleStub.restore();
-            conversationStub1.restore();
-            conversationStub2.restore();
-            conversationStub3.restore();
+            handleRequestSpy.restore();
+            analyticsStub.restore();
+        });
+
+        it('Should log user message to analytics', (done) => {
+            const handleRequestStub = sinon.stub(DialogflowApp.prototype, 'handleRequest');
+            const analyticsStub = sinon.stub(Analytics.prototype, "logUserMessage")
+                .withArgs("500 ml", "log_water");
+
+            waterLogFunctions.waterLog(mockRequest, mockResponse);
+
+            chai.assert.equal(analyticsStub.called, true);
+
+            done();
+
+            handleRequestStub.restore();
+            analyticsStub.restore();
         });
     });
 })

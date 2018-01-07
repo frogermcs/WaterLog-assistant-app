@@ -23,6 +23,8 @@ describe('Conversation', () => {
     let factsRepositoryInstance;
     let analyticsInstance;
 
+    let logAgentReplyStub;
+
     before(() => {
         dialogFlowAppInstance = new DialogflowApp();
         //Set supported permissions (normally initlialised in Dialogflow c-tor)
@@ -52,7 +54,11 @@ describe('Conversation', () => {
             analyticsInstance);
 
         sinon.stub(dialogFlowAppInstance, 'getUser').returns(exampleUser);
-        sinon.stub(analyticsInstance, 'logAgentReply').returns();
+        logAgentReplyStub = sinon.stub(analyticsInstance, 'logAgentReply').returns();
+    });
+
+    after(() => {
+        logAgentReplyStub.restore();
     });
 
     describe('actionWelcomeUser', () => {
@@ -484,6 +490,115 @@ describe('Conversation', () => {
             factsRepositoryMock.restore();
             dialogFlowAppMock.restore();
 
+        });
+    });
+
+    describe('actionsDefaultMessage', () => {
+        it('Should response with random default fallback', (done) => {
+            //Temporary make fallback array length = 1
+            const fallback_back = Str.DEFAULT_FALLBACK;
+            Str.DEFAULT_FALLBACK = Str.DEFAULT_FALLBACK.slice(0, 1);
+
+            const dialogFlowAppMock = sinon.mock(dialogFlowAppInstance);
+            dialogFlowAppMock
+                .expects('ask')
+                .once().withArgs(Str.DEFAULT_FALLBACK[0], Str.DEFAULT_FALLBACK)
+                .returns(true);
+
+            conversationInstance.actionsDefaultMessage();
+
+            dialogFlowAppMock.verify();
+            done();
+
+            dialogFlowAppMock.restore();
+            //Restore fallback array
+            Str.DEFAULT_FALLBACK = fallback_back;
+        });
+    });
+
+    describe('private API', () => {
+        it('Should log agent reply when asking for something', (done) => {
+            //Escape from global stub
+            logAgentReplyStub.restore();
+
+            const message = "lorem ipsum";
+            const dialogFlowStub = sinon.stub(dialogFlowAppInstance, 'ask').returns(true);
+            const analyticsMock = sinon.mock(analyticsInstance);
+            analyticsMock
+                .expects('logAgentReply')
+                .once().withArgs(message)
+                .returns(true);
+
+            conversationInstance._ask(message);
+
+            analyticsMock.verify();
+            done();
+
+            analyticsMock.restore();
+            dialogFlowStub.restore();
+        });
+
+        it('Should log agent reply when asking for something with suggestion chips', (done) => {
+            //Escape from global stub
+            logAgentReplyStub.restore();
+
+            const message = "lorem ipsum";
+            const dialogFlowStub = sinon.stub(dialogFlowAppInstance, 'ask').returns(true);
+            const analyticsMock = sinon.mock(analyticsInstance);
+            analyticsMock
+                .expects('logAgentReply')
+                .once().withArgs(message)
+                .returns(true);
+
+            conversationInstance._askWithSuggestionChips(message);
+
+            analyticsMock.verify();
+            done();
+
+            analyticsMock.restore();
+            dialogFlowStub.restore();
+        });
+
+        it('Should log agent reply when telling something', (done) => {
+            //Escape from global stub
+            logAgentReplyStub.restore();
+
+            const message = "lorem ipsum";
+            const dialogFlowStub = sinon.stub(dialogFlowAppInstance, 'tell').returns(true);
+            const analyticsMock = sinon.mock(analyticsInstance);
+            analyticsMock
+                .expects('logAgentReply')
+                .once().withArgs(message)
+                .returns(true);
+
+            conversationInstance._tell(message);
+
+            analyticsMock.verify();
+            done();
+
+            analyticsMock.restore();
+            dialogFlowStub.restore();
+        });
+
+        it('Should log agent reply when asking for permission', (done) => {
+            //Escape from global stub
+            logAgentReplyStub.restore();
+
+            const message = "lorem ipsum";
+            const dialogFlowStub = sinon.stub(dialogFlowAppInstance, 'askForPermission').returns(true);
+            const analyticsMock = sinon.mock(analyticsInstance);
+            analyticsMock
+                .expects('logAgentReply')
+                .once().withArgs("Ask for permission: " + message)
+                .returns(true);
+
+            conversationInstance._askForPermission(message);
+
+            analyticsMock.verify();
+            done();
+
+            analyticsMock.restore();
+            dialogFlowStub.restore();
         });
     });
 });

@@ -15,6 +15,7 @@ const Analytics = require('./analytics');
 const Actions = require('./assistant-actions');
 const ChatbaseFactory = require('@google/chatbase');
 
+//Load config, API keys etc.
 require('dotenv').config({path: __dirname + "/.env"});
 
 firebaseAdmin.initializeApp(functions.config().firebase);
@@ -47,6 +48,10 @@ exports.waterLog = functions.https.onRequest((request, response) => {
     actionMap.set(Actions.ACTION_UPDATE_SETTINGS, () => conversation.actionUpdateSettings());
     actionMap.set(Actions.ACTION_USER_DATA, () => conversation.actionUserData());
     actionMap.set(Actions.ACTION_FACTS_DRINKING_WATER, () => conversation.getFactForDrinkingWater());
+    actionMap.set(Actions.ACTION_DEFAULT_FALLBACK, () => conversation.actionsDefaultMessage());
+
+    console.log(dialogflowApp.getRawInput());
+    console.log(dialogflowApp.getIntent());
 
     analytics.logUserMessage(
         dialogflowApp.getRawInput(),
