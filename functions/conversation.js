@@ -161,7 +161,7 @@ class Conversation {
     //Intent input.unknown
     actionsDefaultMessage() {
         const message = Str.DEFAULT_FALLBACK[Math.floor(Math.random() * Str.DEFAULT_FALLBACK.length)];
-        this._ask(message, Str.DEFAULT_FALLBACK);
+        this._ask(message, Str.DEFAULT_FALLBACK.slice(0, 3));
     }
 
     _getCurrentUserId() {
