@@ -1,7 +1,6 @@
 class UserManager {
     constructor(firebaseAdmin) {
         this.firebaseAdmin = firebaseAdmin;
-        this.user = null;
     }
 
     isFirstUsage(assistantUserId) {
