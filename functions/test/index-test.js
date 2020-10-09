@@ -7,7 +7,7 @@ const Analytics = require('../analytics');
 const DialogflowApp = require('actions-on-google').DialogflowApp;
 const firebaseAdmin = require('firebase-admin');
 const functions = require('firebase-functions');
-const ChatbaseFactory = require('@google/chatbase');
+// const ChatbaseFactory = require('@google/chatbase');
 
 const {
     MockResponse,
@@ -22,14 +22,14 @@ describe('Cloud Functions', () => {
     let mockResponse;
     let mockRequest;
     let waterLogFunctions;
-    let chatbaseSetUserIdStub;
-    let chatbaseSetPlatformStub;
-    let chatbaseSetApiKeyStub;
+    // let chatbaseSetUserIdStub;
+    // let chatbaseSetPlatformStub;
+    // let chatbaseSetApiKeyStub;
 
     before(() => {
-        chatbaseSetUserIdStub = sinon.stub().returns();
-        chatbaseSetPlatformStub = sinon.stub().returns({setUserId: chatbaseSetUserIdStub});
-        chatbaseSetApiKeyStub = sinon.stub(ChatbaseFactory, 'setApiKey').returns({setPlatform: chatbaseSetPlatformStub});
+        // chatbaseSetUserIdStub = sinon.stub().returns();
+        // chatbaseSetPlatformStub = sinon.stub().returns({setUserId: chatbaseSetUserIdStub});
+        // chatbaseSetApiKeyStub = sinon.stub(ChatbaseFactory, 'setApiKey').returns({setPlatform: chatbaseSetPlatformStub});
 
         firebaseInitStub = sinon.stub(firebaseAdmin, 'initializeApp');
         configStub = sinon.stub(functions, 'config').returns({

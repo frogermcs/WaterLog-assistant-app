@@ -24,56 +24,56 @@ describe('UserManager', () => {
         userManagerInstance.user = null;
     });
 
-    describe('isFirstUsage', () => {
-        it('Should return first usage when user doesnt exist in DB', (done) => {
-            const dataUserDoesntExist = new functions.database.DeltaSnapshot(null, null, null, null);
-            const fakeEvent = {data: dataUserDoesntExist};
-            const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
-            const refStub = sinon.stub().withArgs('users/' + exampleUser.userId).returns({once: onceStub});
-            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+    // describe('isFirstUsage', () => {
+    //     it('Should return first usage when user doesnt exist in DB', (done) => {
+    //         const dataUserDoesntExist = new functions.database.DeltaSnapshot(null, null, null, null);
+    //         const fakeEvent = {data: dataUserDoesntExist};
+    //         const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
+    //         const refStub = sinon.stub().withArgs('users/' + exampleUser.userId).returns({once: onceStub});
+    //         const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
 
-            userManagerInstance.isFirstUsage(exampleUser.userId).then(firstUsage => {
-                chai.assert.equal(firstUsage, true);
-                done();
+    //         userManagerInstance.isFirstUsage(exampleUser.userId).then(firstUsage => {
+    //             chai.assert.equal(firstUsage, true);
+    //             done();
 
-                databaseStub.restore();
-            });
-        });
+    //             databaseStub.restore();
+    //         });
+    //     });
 
-        it('Shouldnt return first usage when user exists in DB', (done) => {
-            const dataUserExists = new functions.database.DeltaSnapshot(null, null, null, "exampleUser");
-            const fakeEvent = {data: dataUserExists};
-            const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
-            const refStub = sinon.stub().withArgs('users/' + exampleUser.userId).returns({once: onceStub});
-            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+    //     it('Shouldnt return first usage when user exists in DB', (done) => {
+    //         const dataUserExists = new functions.database.DeltaSnapshot(null, null, null, "exampleUser");
+    //         const fakeEvent = {data: dataUserExists};
+    //         const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
+    //         const refStub = sinon.stub().withArgs('users/' + exampleUser.userId).returns({once: onceStub});
+    //         const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
 
-            userManagerInstance.isFirstUsage(exampleUser.userId).then(firstUsage => {
-                chai.assert.equal(firstUsage, false);
-                done();
+    //         userManagerInstance.isFirstUsage(exampleUser.userId).then(firstUsage => {
+    //             chai.assert.equal(firstUsage, false);
+    //             done();
 
-                databaseStub.restore();
-            });
-        });
+    //             databaseStub.restore();
+    //         });
+    //     });
 
-    });
+    // });
 
-    describe('loadAssistantUser', () => {
-        it('Shouldnt load expected user from DB', (done) => {
-            const dataUserExists = new functions.database.DeltaSnapshot(null, null, null, exampleUser);
-            const fakeEvent = {data: dataUserExists};
-            const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
-            const refStub = sinon.stub().withArgs('users/' + exampleUser.userId).returns({once: onceStub});
-            const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
+    // describe('loadAssistantUser', () => {
+    //     it('Shouldnt load expected user from DB', (done) => {
+    //         const dataUserExists = new functions.database.DeltaSnapshot(null, null, null, exampleUser);
+    //         const fakeEvent = {data: dataUserExists};
+    //         const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
+    //         const refStub = sinon.stub().withArgs('users/' + exampleUser.userId).returns({once: onceStub});
+    //         const databaseStub = sinon.stub(firebase, 'database').returns({ref: refStub});
 
-            userManagerInstance.loadAssistantUser(exampleUser.userId).then(user => {
-                chai.assert.deepEqual(user, exampleUser);
-                done();
+    //         userManagerInstance.loadAssistantUser(exampleUser.userId).then(user => {
+    //             chai.assert.deepEqual(user, exampleUser);
+    //             done();
 
-                databaseStub.restore();
-            });
-        });
+    //             databaseStub.restore();
+    //         });
+    //     });
 
-    });
+    // });
 
     describe('saveAssistantUser', () => {
         it('Should save assistant user into DB', (done) => {

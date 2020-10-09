@@ -13,7 +13,7 @@ const TimeManager = require('./time-manager.js');
 const FactsRepository = require('./facts-repository');
 const Analytics = require('./analytics');
 const Actions = require('./assistant-actions');
-const ChatbaseFactory = require('@google/chatbase');
+// const ChatbaseFactory = require('@google/chatbase');
 
 //Load config, API keys etc.
 require('dotenv').config({path: __dirname + "/.env"});
@@ -31,12 +31,12 @@ exports.waterLog = functions.https.onRequest((request, response) => {
     const waterLog = new WaterLog(firebaseAdmin, timeManager);
     const factsRepository = new FactsRepository(dialogflowApp);
 
-    const chatbase = ChatbaseFactory
-        .setApiKey(process.env.MY_CHATBASE_KEY)
-        .setPlatform('GoogleAssistant')
-        .setUserId(dialogflowApp.getUser().userId);
+    // const chatbase = ChatbaseFactory
+    //     .setApiKey(process.env.MY_CHATBASE_KEY)
+    //     .setPlatform('GoogleAssistant')
+    //     .setUserId(dialogflowApp.getUser().userId);
 
-    const analytics = new Analytics(chatbase);
+    const analytics = new Analytics(/*chatbase*/);
 
     const conversation = new Conversation(dialogflowApp, userManager, waterLog, timeManager, factsRepository, analytics);
 
