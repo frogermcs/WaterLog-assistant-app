@@ -1,7 +1,7 @@
 {
   "name": "water-log",
   "description": "Daily water logger",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "author": "froger_mcs",
   "repository": {
     "type": "git",
@@ -9,15 +9,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "actions-on-google": "^1.7.0",
-    "firebase": "^4.5.1",
-    "firebase-admin": "~5.4.0",
-    "firebase-functions": "^0.7.0",
+    "actions-on-google": "1.7.0",
+    "firebase": "7.23.0",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.1",
     "geo-tz": "^3.3.3",
-    "mathjs": "^3.18.0",
-    "moment-timezone": "^0.5.14",
-    "dotenv": "^4.0.0",
-    "@google/chatbase": "1.0.0"
+    "mathjs": "^7.5.0",
+    "moment-timezone": "^0.5.31",
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
     "chai": "*",

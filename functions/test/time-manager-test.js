@@ -49,94 +49,94 @@ describe('TimeManager', () => {
         });
     });
 
-    describe('saveAssistantUserTimezone', () => {
-        const expectedUserId = 'abc123';
-        const expectedTimezone = 'Europe/Paris';
+    // describe('saveAssistantUserTimezone', () => {
+    //     const expectedUserId = 'abc123';
+    //     const expectedTimezone = 'Europe/Paris';
 
-        it('Should save assistant user timezone into DB', (done) => {
-            const setSpy = sinon.spy();
-            const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({set: setSpy});
-            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
+    //     it('Should save assistant user timezone into DB', (done) => {
+    //         const setSpy = sinon.spy();
+    //         const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({set: setSpy});
+    //         const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
-            timeManagerInstance.saveAssistantUserTimezone(expectedUserId, expectedTimezone).then(() => {
-                chai.assert(setSpy.calledWith({timezone: expectedTimezone}));
-                done();
+    //         timeManagerInstance.saveAssistantUserTimezone(expectedUserId, expectedTimezone).then(() => {
+    //             chai.assert(setSpy.calledWith({timezone: expectedTimezone}));
+    //             done();
 
-                databaseStub.restore();
-            });
-        });
-    });
+    //             databaseStub.restore();
+    //         });
+    //     });
+    // });
 
-    describe('getAssistantUserTimeData', () => {
-        const expectedUserTimeData = {timezone: 'America/New_York'};
-        const expectedUserId = 'abc123';
+    // describe('getAssistantUserTimeData', () => {
+    //     const expectedUserTimeData = {timezone: 'America/New_York'};
+    //     const expectedUserId = 'abc123';
 
-        it('Should return local user time if exists', (done) => {
-            const dataTimezoneExists = new functions.database.DeltaSnapshot(null, null, null, expectedUserTimeData);
-            const fakeEvent = {data: dataTimezoneExists};
-            const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
-            const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({once: onceStub});
-            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
+    //     it('Should return local user time if exists', (done) => {
+    //         const dataTimezoneExists = new functions.database.DeltaSnapshot(null, null, null, expectedUserTimeData);
+    //         const fakeEvent = {data: dataTimezoneExists};
+    //         const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
+    //         const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({once: onceStub});
+    //         const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
-            timeManagerInstance.getAssistantUserTimeData(expectedUserId).then(userTimeData => {
-                chai.assert.deepEqual(userTimeData, expectedUserTimeData);
-                done();
+    //         timeManagerInstance.getAssistantUserTimeData(expectedUserId).then(userTimeData => {
+    //             chai.assert.deepEqual(userTimeData, expectedUserTimeData);
+    //             done();
 
-                databaseStub.restore();
-            });
-        });
-    });
+    //             databaseStub.restore();
+    //         });
+    //     });
+    // });
 
-    describe('getTodayStartTimestampForAssistantUser', () => {
-        const expectedPlatformTimezone = 'Europe/Paris';
-        const expectedUserTimeData = {timezone: 'America/New_York'};
-        const expectedUserId = 'abc123';
+    // describe('getTodayStartTimestampForAssistantUser', () => {
+    //     const expectedPlatformTimezone = 'Europe/Paris';
+    //     const expectedUserTimeData = {timezone: 'America/New_York'};
+    //     const expectedUserId = 'abc123';
 
-        const expectedDate = new Date('2017-11-04T04:00:00.000Z');
+    //     const expectedDate = new Date('2017-11-04T04:00:00.000Z');
 
-        it('Should return date for start of the day for user timezone if exists', () => {
-            const dataTimezoneExists = new functions.database.DeltaSnapshot(null, null, null, expectedUserTimeData);
-            const fakeEvent = {data: dataTimezoneExists};
-            const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
-            const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({once: onceStub});
-            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
+    //     it('Should return date for start of the day for user timezone if exists', () => {
+    //         const dataTimezoneExists = new functions.database.DeltaSnapshot(null, null, null, expectedUserTimeData);
+    //         const fakeEvent = {data: dataTimezoneExists};
+    //         const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
+    //         const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({once: onceStub});
+    //         const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
-            const toDateStub = sinon.stub().returns(expectedDate);
-            const startOfStub = sinon.stub().withArgs('day').returns({toDate: toDateStub});
-            const tzStub = sinon.stub(moment, 'tz');
+    //         const toDateStub = sinon.stub().returns(expectedDate);
+    //         const startOfStub = sinon.stub().withArgs('day').returns({toDate: toDateStub});
+    //         const tzStub = sinon.stub(moment, 'tz');
 
-            tzStub.withArgs(expectedUserTimeData.timezone).returns({startOf: startOfStub});
+    //         tzStub.withArgs(expectedUserTimeData.timezone).returns({startOf: startOfStub});
 
-            return timeManagerInstance.getTodayStartTimestampForAssistantUser(expectedUserId).then(userTimeData => {
-                chai.assert.equal(userTimeData, expectedDate);
+    //         return timeManagerInstance.getTodayStartTimestampForAssistantUser(expectedUserId).then(userTimeData => {
+    //             chai.assert.equal(userTimeData, expectedDate);
 
-                databaseStub.restore();
-                tzStub.restore();
-            });
-        });
+    //             databaseStub.restore();
+    //             tzStub.restore();
+    //         });
+    //     });
 
-        it('Should return start of the day date for platform when user timezone doesnt exist', () => {
-            const dataTimezoneNotExists = new functions.database.DeltaSnapshot(null, null, null, null);
-            const fakeEvent = {data: dataTimezoneNotExists};
-            const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
-            const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({once: onceStub});
-            const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
+    //     it('Should return start of the day date for platform when user timezone doesnt exist', () => {
+    //         const dataTimezoneNotExists = new functions.database.DeltaSnapshot(null, null, null, null);
+    //         const fakeEvent = {data: dataTimezoneNotExists};
+    //         const onceStub = sinon.stub().withArgs('value').returns(Promise.resolve(fakeEvent.data));
+    //         const refStub = sinon.stub().withArgs('userTime/' + expectedUserId).returns({once: onceStub});
+    //         const databaseStub = sinon.stub(firebaseAdmin, 'database').returns({ref: refStub});
 
-            const toDateStub = sinon.stub().returns(expectedDate);
-            const startOfStub = sinon.stub().withArgs('day').returns({toDate: toDateStub});
-            const tzStub = sinon.stub(moment, 'tz');
-            const guessStub = sinon.stub(moment.tz, 'guess')
+    //         const toDateStub = sinon.stub().returns(expectedDate);
+    //         const startOfStub = sinon.stub().withArgs('day').returns({toDate: toDateStub});
+    //         const tzStub = sinon.stub(moment, 'tz');
+    //         const guessStub = sinon.stub(moment.tz, 'guess')
 
-            guessStub.returns(expectedPlatformTimezone);
-            tzStub.withArgs(expectedPlatformTimezone).returns({startOf: startOfStub});
+    //         guessStub.returns(expectedPlatformTimezone);
+    //         tzStub.withArgs(expectedPlatformTimezone).returns({startOf: startOfStub});
 
-            return timeManagerInstance.getTodayStartTimestampForAssistantUser(expectedUserId).then(userTimeData => {
-                chai.assert.equal(userTimeData, expectedDate);
+    //         return timeManagerInstance.getTodayStartTimestampForAssistantUser(expectedUserId).then(userTimeData => {
+    //             chai.assert.equal(userTimeData, expectedDate);
 
-                databaseStub.restore();
-                tzStub.restore();
-                guessStub.restore();
-            });
-        });
-    });
+    //             databaseStub.restore();
+    //             tzStub.restore();
+    //             guessStub.restore();
+    //         });
+    //     });
+    // });
 });

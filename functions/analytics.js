@@ -3,42 +3,50 @@ const Actions = require('./assistant-actions');
 
 class Analytics {
 
-    constructor(chatbase) {
-        this.chatbase = chatbase;
+    constructor() {
+
     }
 
     logUserMessage(msg, intent) {
-        let userMessage = this.chatbase
-            .newMessage()
-            .setMessage(msg)
-            .setAsTypeUser()
-            .setIntent(intent)
-            .setVersion(PackageJson.version);
+        //TBD
 
-        if (intent === Actions.ACTION_DEFAULT_FALLBACK) {
-            userMessage = userMessage.setAsNotHandled();
-        } else {
-            userMessage = userMessage.setAsHandled();
-        }
+        // Old chatbase code below v
 
-        userMessage.send()
-            .then(msg => {
-                console.log(msg.getCreateResponse());
-            })
-            .catch(err => console.error(err));
+        // let userMessage = this.chatbase
+        //     .newMessage()
+        //     .setMessage(msg)
+        //     .setAsTypeUser()
+        //     .setIntent(intent)
+        //     .setVersion(PackageJson.version);
+
+        // if (intent === Actions.ACTION_DEFAULT_FALLBACK) {
+        //     userMessage = userMessage.setAsNotHandled();
+        // } else {
+        //     userMessage = userMessage.setAsHandled();
+        // }
+
+        // userMessage.send()
+        //     .then(msg => {
+        //         console.log(msg.getCreateResponse());
+        //     })
+        //     .catch(err => console.error(err));
     }
 
     logAgentReply(msg) {
-        this.chatbase
-            .newMessage()
-            .setMessage(msg)
-            .setAsTypeAgent()
-            .setVersion(PackageJson.version)
-            .send()
-            .then(msg => {
-                console.log(msg.getCreateResponse())
-            })
-            .catch(err => console.error(err));
+        //TBD
+
+        // Old chatbase code below v
+        
+        // this.chatbase
+        //     .newMessage()
+        //     .setMessage(msg)
+        //     .setAsTypeAgent()
+        //     .setVersion(PackageJson.version)
+        //     .send()
+        //     .then(msg => {
+        //         console.log(msg.getCreateResponse())
+        //     })
+        //     .catch(err => console.error(err));
     }
 
 }
